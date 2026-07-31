@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>내 공연</title>
+
+    <style>
+        :root {
+            --color-primary: #585fef;
+            --color-violet: #8a63ff;
+            --color-pink: #ff6faf;
+            --color-mint: #34d1bf;
+            --color-amber: #ffb347;
+
+            --color-background: #060a27;
+            --color-surface: #141b3a;
+            --color-card: #080d2c;
+            --color-tabbar: #111938;
+            --color-border: #555a70;
+
+            --color-white: #ffffff;
+            --color-soft-gray: #dbdce6;
+            --color-muted: #8d92a6;
+
+            --page-padding: 24px;
+            --tabbar-height: 86px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: var(--color-background);
+            color: var(--color-white);
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        img {
+            display: block;
+        }
+
+        .my-performance-page {
+            width: 100%;
+            min-height: 100svh;
+            background-color: var(--color-background);
+        }
+
+        .my-performance-content {
+            width: 100%;
+            min-height: 100svh;
+            padding:
+                67px
+                var(--page-padding)
+                calc(
+                    var(--tabbar-height) +
+                    48px +
+                    env(safe-area-inset-bottom)
+                );
+        }
+
+        /* 화면 제목 */
+        .page-header {
+            width: 100%;
+        }
+
+        .page-header__title {
+            color: var(--color-white);
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        /* 공연 상태 탭 */
+        .performance-tabs {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            width: 100%;
+            margin-top: 21px;
+        }
+
+        .performance-tabs__item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 60px;
+            height: 34px;
+            padding: 0 17px;
+            border-radius: 999px;
+            color: var(--color-soft-gray);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .performance-tabs__item--active {
+            min-width: 76px;
+            background:
+                linear-gradient(
+                    100deg,
+                    var(--color-primary) 0%,
+                    var(--color-violet) 100%
+                );
+            color: var(--color-white);
+        }
+
+        /* 공연 카드 */
+        .performance-card {
+            display: flex;
+            width: 100%;
+            height: 178px;
+            margin-top: 24px;
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+            border-radius: 15px;
+            background-color: var(--color-card);
+        }
+
+        .performance-card__image-link {
+            display: block;
+            flex-shrink: 0;
+            width: 98px;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 14px 0 0 14px;
+            background-color: #241070;
+        }
+
+        .performance-card__image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .performance-card__body {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+            padding: 20px 15px 20px 16px;
+        }
+
+        .performance-card__title {
+            color: var(--color-white);
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.3;
+            letter-spacing: -0.35px;
+        }
+
+        .performance-card__meta {
+            margin-top: 10px;
+            color: var(--color-soft-gray);
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.4;
+            letter-spacing: -0.35px;
+            white-space: nowrap;
+        }
+
+        .performance-card__dday {
+            color: var(--color-amber);
+            font-weight: 600;
+        }
+
+        .performance-card__bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            width: 100%;
+            margin-top: 25px;
+        }
+
+        .performance-card__type {
+            color: var(--color-muted);
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        .performance-card__prepare {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            height: 25px;
+            padding: 0 11px;
+            border-radius: 999px;
+            background:
+                linear-gradient(
+                    100deg,
+                    var(--color-primary) 0%,
+                    var(--color-violet) 100%
+                );
+            color: var(--color-white);
+            font-size: 12px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .performance-card__prepare:active {
+            opacity: 0.82;
+        }
+
+        /* 구분선 */
+        .content-divider {
+            width: 100%;
+            height: 1px;
+            margin-top: 23px;
+            background-color: rgba(255, 255, 255, 0.86);
+        }
+
+        /* 준비 체크리스트 */
+        .checklist-section {
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        .checklist-section__title {
+            color: var(--color-white);
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.6px;
+        }
+
+        .checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-top: 16px;
+            list-style: none;
+        }
+
+        .checklist__item {
+            width: 100%;
+        }
+
+        .checklist__link {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 41px;
+            padding: 0 14px 0 17px;
+            border: 1px solid var(--color-soft-gray);
+            border-radius: 8px;
+            background-color: var(--color-surface);
+        }
+
+        .checklist__check-icon {
+            flex-shrink: 0;
+            width: 19px;
+            height: 19px;
+            object-fit: contain;
+        }
+
+        .checklist__text {
+            flex: 1;
+            min-width: 0;
+            margin-left: 11px;
+            color: var(--color-white);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1;
+            letter-spacing: -0.35px;
+        }
+
+        .checklist__arrow {
+            flex-shrink: 0;
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+
+        .checklist__link:active {
+            border-color: var(--color-violet);
+            background-color: #182044;
+        }
+
+        /* 공통 하단 탭바 */
+        .tabbar {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+
+            width: 100%;
+            height:
+                calc(
+                    var(--tabbar-height) +
+                    env(safe-area-inset-bottom)
+                );
+
+            padding:
+                8px
+                20px
+                env(safe-area-inset-bottom);
+
+            border-top: 1px solid #4c5268;
+            border-radius: 16px 16px 0 0;
+            background-color: var(--color-tabbar);
+        }
+
+        .tabbar__list {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            list-style: none;
+        }
+
+        .tabbar__item {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tabbar__link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: var(--color-soft-gray);
+        }
+
+        .tabbar__icon {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .tabbar__label {
+            margin-top: 6px;
+            color: var(--color-soft-gray);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .tabbar__link--active .tabbar__label {
+            color: var(--color-violet);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="my-performance-page">
+
+        <main class="my-performance-content">
+
+            <!-- 화면 제목 -->
+            <header class="page-header">
+                <h1 class="page-header__title">내 공연</h1>
+            </header>
+
+            <!-- 공연 상태 탭 -->
+            <nav
+                class="performance-tabs"
+                aria-label="내 공연 상태"
+            >
+                <a
+                    class="performance-tabs__item"
+                    href="./my-performance-saved.html"
+                >
+                    저장
+                </a>
+
+                <a
+                    class="performance-tabs__item performance-tabs__item--active"
+                    href="./my-performance.html"
+                    aria-current="page"
+                >
+                    전체
+                </a>
+
+                <a
+                    class="performance-tabs__item"
+                    href="./my-performance-completed.html"
+                >
+                    완료
+                </a>
+            </nav>
+
+            <!-- 예매 공연 카드 -->
+            <article class="performance-card">
+
+                <a
+                    class="performance-card__image-link"
+                    href="./event2.html"
+                    aria-label="2025 Con:nect Live Tour 공연 상세 보기"
+                >
+                    <img
+                        class="performance-card__image"
+                        src="./Images/08.png"
+                        alt="보라색 조명의 Con:nect Live Tour 공연장"
+                    >
+                </a>
+
+                <div class="performance-card__body">
+                    <a href="./event2.html">
+                        <h2 class="performance-card__title">
+                            2025 CON:NECT<br>
+                            LIVE TOUR
+                        </h2>
+
+                        <p class="performance-card__meta">
+                            예매 완료 ·
+                            <span class="performance-card__dday">D-3</span>
+                            · KSPO DOME
+                        </p>
+                    </a>
+
+                    <div class="performance-card__bottom">
+                        <span class="performance-card__type">
+                            예매 정보
+                        </span>
+
+                        <a
+                            class="performance-card__prepare"
+                            href="./event2.html"
+                        >
+                            준비 체크
+                        </a>
+                    </div>
+                </div>
+
+            </article>
+
+            <div class="content-divider"></div>
+
+            <!-- 준비 체크리스트 -->
+            <section class="checklist-section">
+                <h2 class="checklist-section__title">
+                    준비 체크리스트
+                </h2>
+
+                <ul class="checklist">
+
+                    <li class="checklist__item">
+                        <a
+                            class="checklist__link"
+                            href="./check-ticket.html"
+                        >
+                            <img
+                                class="checklist__check-icon"
+                                src="./Icons/checkbox.svg"
+                                alt="확인 완료"
+                            >
+
+                            <span class="checklist__text">
+                                티켓 확인
+                            </span>
+
+                            <img
+                                class="checklist__arrow"
+                                src="./Icons/right.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <li class="checklist__item">
+                        <a
+                            class="checklist__link"
+                            href="./check-id.html"
+                        >
+                            <img
+                                class="checklist__check-icon"
+                                src="./icons/checkbox.svg"
+                                alt="확인 완료"
+                            >
+
+                            <span class="checklist__text">
+                                신분증 준비
+                            </span>
+
+                            <img
+                                class="checklist__arrow"
+                                src="./Icons/right.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <li class="checklist__item">
+                        <a
+                            class="checklist__link"
+                            href="./check-lightstick.html"
+                        >
+                            <img
+                                class="checklist__check-icon"
+                                src="./icons/checkbox.svg"
+                                alt="확인 완료"
+                            >
+
+                            <span class="checklist__text">
+                                응원봉 충전
+                            </span>
+
+                            <img
+                                class="checklist__arrow"
+                                src="./Icons/right.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <li class="checklist__item">
+                        <a
+                            class="checklist__link"
+                            href="./check-transportation.html"
+                        >
+                            <img
+                                class="checklist__check-icon"
+                                src="./icons/checkbox.svg"
+                                alt="확인 완료"
+                            >
+
+                            <span class="checklist__text">
+                                교통 정보 확인
+                            </span>
+
+                            <img
+                                class="checklist__arrow"
+                                src="./Icons/right.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                </ul>
+            </section>
+
+        </main>
+
+        <!-- 공통 하단 탭바 -->
+        <nav class="tabbar" aria-label="주요 메뉴">
+            <ul class="tabbar__list">
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./home.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/home-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">홈</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./search1.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/search-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">탐색</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link tabbar__link--active"
+                        href="./event1.html"
+                        aria-current="page"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/bookmark-3.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">내 공연</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./talk.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/message-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">팬톡</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./my.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/user-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">마이</span>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+    </div>
+</body>
+</html>

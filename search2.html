@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>검색필터</title>
+
+    <style>
+        :root {
+            --color-primary: #585fef;
+            --color-violet: #8a63ff;
+            --color-pink: #ff6faf;
+            --color-mint: #34d1bf;
+
+            --color-background: #060a27;
+            --color-surface: #141c3d;
+            --color-tabbar: #111938;
+            --color-border: #50566d;
+
+            --color-white: #ffffff;
+            --color-soft-gray: #dbdce6;
+            --color-muted: #b5b8c8;
+
+            --page-padding: 22px;
+            --tabbar-height: 86px;
+            --action-height: 104px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: var(--color-background);
+            color: var(--color-white);
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        img {
+            display: block;
+        }
+
+        .filter-page {
+            width: 100%;
+            min-height: 100svh;
+            background-color: var(--color-background);
+        }
+
+        .filter-content {
+            width: 100%;
+            min-height: 100svh;
+            padding:
+                66px
+                var(--page-padding)
+                calc(
+                    var(--action-height) +
+                    var(--tabbar-height) +
+                    46px +
+                    env(safe-area-inset-bottom)
+                );
+        }
+
+        /* 상단 내비게이션 */
+        .page-header {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 44px;
+        }
+
+        .page-header__back {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 28px;
+            height: 44px;
+            margin-right: 6px;
+        }
+
+        .page-header__back-icon {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+        }
+
+        .page-header__title {
+            color: var(--color-white);
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        /* 검색창 */
+        .search-form {
+            position: relative;
+            width: 100%;
+            height: 51px;
+            margin-top: 19px;
+        }
+
+        .search-form__icon {
+            position: absolute;
+            top: 50%;
+            left: 18px;
+            z-index: 2;
+            width: 21px;
+            height: 21px;
+            object-fit: contain;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .search-form__input {
+            display: block;
+            width: 100%;
+            height: 51px;
+            padding: 0 18px 0 49px;
+
+            border: 1px solid #555b70;
+            border-radius: 14px;
+            outline: none;
+
+            background-color: var(--color-surface);
+            color: var(--color-white);
+
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 51px;
+            letter-spacing: -0.35px;
+        }
+
+        .search-form__input::placeholder {
+            color: #c9cbd6;
+            opacity: 1;
+        }
+
+        .search-form__input:focus {
+            border-color: var(--color-violet);
+            box-shadow: 0 0 0 2px rgba(138, 99, 255, 0.14);
+        }
+
+        .search-form__input::-webkit-search-cancel-button {
+            display: none;
+        }
+
+        /* 필터 영역 */
+        .filter-groups {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+            width: 100%;
+            margin-top: 33px;
+        }
+
+        .filter-group {
+            width: 100%;
+        }
+
+        .filter-group__title {
+            color: var(--color-white);
+            font-size: 19px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.55px;
+        }
+
+        /*
+            화면 너비를 넘어가는 필터는 가로 스크롤됩니다.
+            오른쪽 여백을 추가해 마지막 필터도 잘리지 않게 처리합니다.
+        */
+        .filter-group__scroll {
+            width: calc(100% + var(--page-padding));
+            margin-top: 11px;
+            margin-right: calc(var(--page-padding) * -1);
+            overflow-x: auto;
+            overflow-y: hidden;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .filter-group__scroll::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-group__list {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: max-content;
+            min-width: 100%;
+            padding-right: var(--page-padding);
+            list-style: none;
+        }
+
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            height: 33px;
+            padding: 0 16px;
+
+            border: 1px solid var(--color-border);
+            border-radius: 999px;
+
+            background-color: var(--color-surface);
+            color: var(--color-soft-gray);
+
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .filter-chip--active {
+            border-color: transparent;
+            background:
+                linear-gradient(
+                    100deg,
+                    var(--color-primary) 0%,
+                    #8b43df 100%
+                );
+            color: var(--color-white);
+        }
+
+        .filter-chip:active {
+            opacity: 0.78;
+        }
+
+        .filter-chip--add {
+            width: 55px;
+            padding: 0;
+        }
+
+        .filter-chip__add-icon {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        /* 초기화·필터 적용 버튼 */
+        .filter-actions {
+            position: fixed;
+            right: 0;
+            bottom:
+                calc(
+                    var(--tabbar-height) +
+                    env(safe-area-inset-bottom)
+                );
+            left: 0;
+            z-index: 90;
+
+            display: flex;
+            align-items: center;
+            gap: 8px;
+
+            width: 100%;
+            height: var(--action-height);
+            padding: 24px var(--page-padding) 15px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(6, 10, 39, 0) 0%,
+                    rgba(6, 10, 39, 0.96) 20%,
+                    var(--color-background) 44%,
+                    var(--color-background) 100%
+                );
+        }
+
+        .filter-actions__reset,
+        .filter-actions__apply {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            height: 55px;
+            border-radius: 13px;
+
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .filter-actions__reset {
+            flex: 1;
+            position: relative;
+            border: 1px solid transparent;
+            background:
+                linear-gradient(
+                    var(--color-background),
+                    var(--color-background)
+                ) padding-box,
+                linear-gradient(
+                    100deg,
+                    var(--color-primary),
+                    var(--color-pink)
+                ) border-box;
+            color: #dc65e9;
+        }
+
+        .filter-actions__apply {
+            flex: 1;
+            background:
+                linear-gradient(
+                    100deg,
+                    var(--color-primary) 0%,
+                    var(--color-violet) 55%,
+                    var(--color-pink) 100%
+                );
+            color: var(--color-white);
+        }
+
+        .filter-actions__reset:active,
+        .filter-actions__apply:active {
+            opacity: 0.82;
+        }
+
+        /* 공통 하단 탭바 */
+        .tabbar {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+
+            width: 100%;
+            height:
+                calc(
+                    var(--tabbar-height) +
+                    env(safe-area-inset-bottom)
+                );
+
+            padding:
+                8px
+                20px
+                env(safe-area-inset-bottom);
+
+            border-top: 1px solid #4c5268;
+            border-radius: 16px 16px 0 0;
+
+            background-color: var(--color-tabbar);
+        }
+
+        .tabbar__list {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            list-style: none;
+        }
+
+        .tabbar__item {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tabbar__link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 100%;
+
+            color: var(--color-soft-gray);
+        }
+
+        .tabbar__icon {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .tabbar__label {
+            margin-top: 6px;
+            color: var(--color-soft-gray);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .tabbar__link--active .tabbar__label {
+            color: var(--color-violet);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="filter-page">
+
+        <main class="filter-content">
+
+            <!-- 상단 내비게이션 -->
+            <header class="page-header">
+                <a
+                    class="page-header__back"
+                    href="./search1.html"
+                    aria-label="탐색 화면으로 돌아가기"
+                >
+                    <img
+                        class="page-header__back-icon"
+                        src="./Icons/left.svg"
+                        alt=""
+                    >
+                </a>
+
+                <h1 class="page-header__title">검색 · 필터</h1>
+            </header>
+
+            <!-- 공연 검색 -->
+            <form
+                class="search-form"
+                action="./search-result.html"
+                method="get"
+            >
+                <img
+                    class="search-form__icon"
+                    src="./Icons/search-2.svg"
+                    alt=""
+                >
+
+                <input
+                    class="search-form__input"
+                    type="search"
+                    name="keyword"
+                    placeholder="아티스트 또는 공연명"
+                    aria-label="아티스트 또는 공연명 검색"
+                >
+            </form>
+
+            <!-- 필터 목록 -->
+            <div class="filter-groups">
+
+                <!-- 지역 -->
+                <section class="filter-group">
+                    <h2 class="filter-group__title">지역</h2>
+
+                    <div class="filter-group__scroll">
+                        <ul class="filter-group__list">
+                            <li>
+                                <a
+                                    class="filter-chip filter-chip--active"
+                                    href="./filter.html"
+                                    aria-current="true"
+                                >
+                                    전체
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-seoul.html">
+                                    서울
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-busan.html">
+                                    부산
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-daegu.html">
+                                    대구
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-incheon.html">
+                                    인천
+                                </a>
+                            </li>
+
+                            <li>
+                                <a
+                                    class="filter-chip filter-chip--add"
+                                    href="./filter-region.html"
+                                    aria-label="다른 지역 선택"
+                                >
+                                    <img
+                                        class="filter-chip__add-icon"
+                                        src="./Icons/plus.svg"
+                                        alt=""
+                                    >
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 날짜 -->
+                <section class="filter-group">
+                    <h2 class="filter-group__title">날짜</h2>
+
+                    <div class="filter-group__scroll">
+                        <ul class="filter-group__list">
+                            <li>
+                                <a
+                                    class="filter-chip filter-chip--active"
+                                    href="./filter.html"
+                                    aria-current="true"
+                                >
+                                    전체
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-this-week.html">
+                                    이번 주
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-this-month.html">
+                                    이번 달
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-date.html">
+                                    직접 선택
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 장르 -->
+                <section class="filter-group">
+                    <h2 class="filter-group__title">장르</h2>
+
+                    <div class="filter-group__scroll">
+                        <ul class="filter-group__list">
+                            <li>
+                                <a
+                                    class="filter-chip filter-chip--active"
+                                    href="./filter.html"
+                                    aria-current="true"
+                                >
+                                    전체
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-concert.html">
+                                    콘서트
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-fanmeeting.html">
+                                    팬미팅
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-festival.html">
+                                    페스티벌
+                                </a>
+                            </li>
+
+                            <li>
+                                <a
+                                    class="filter-chip filter-chip--add"
+                                    href="./filter-genre.html"
+                                    aria-label="다른 장르 선택"
+                                >
+                                    <img
+                                        class="filter-chip__add-icon"
+                                        src="./Icons/plus.svg"
+                                        alt=""
+                                    >
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+                <!-- 상태 -->
+                <section class="filter-group">
+                    <h2 class="filter-group__title">상태</h2>
+
+                    <div class="filter-group__scroll">
+                        <ul class="filter-group__list">
+                            <li>
+                                <a
+                                    class="filter-chip filter-chip--active"
+                                    href="./filter.html"
+                                    aria-current="true"
+                                >
+                                    전체
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-booking-open.html">
+                                    예매 가능
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-booking-soon.html">
+                                    예매 예정
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="filter-chip" href="./filter-soldout-exclude.html">
+                                    매진 제외
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+
+            </div>
+        </main>
+
+        <!-- 하단 필터 버튼 -->
+        <nav class="filter-actions" aria-label="필터 설정">
+            <a
+                class="filter-actions__reset"
+                href="./filter.html"
+            >
+                초기화
+            </a>
+
+            <a
+                class="filter-actions__apply"
+                href="./search-result.html"
+            >
+                필터 적용하기
+            </a>
+        </nav>
+
+        <!-- 공통 하단 탭바 -->
+        <nav class="tabbar" aria-label="주요 메뉴">
+            <ul class="tabbar__list">
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./home.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/home-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">홈</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link tabbar__link--active"
+                        href="./search1.html"
+                        aria-current="page"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/search-1.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">탐색</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./event1.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/bookmark-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">내 공연</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./talk.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/message-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">팬톡</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./my.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/user-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">마이</span>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+    </div>
+</body>
+</html>

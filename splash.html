@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>스플래시</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            overflow: hidden;
+            background-color: #0f1423;
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+        }
+
+        .splash {
+            position: relative;
+            width: 100%;
+            height: 100svh;
+            overflow: hidden;
+
+            /* 로고와 글자가 없는 공연장 배경 이미지를 사용합니다. */
+            background-image: url("./Images/01-1.png");
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-size: cover;
+        }
+
+        /* 시안의 어두운 네이비 분위기를 보강하는 오버레이 */
+        .splash::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            pointer-events: none;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(3, 8, 51, 0.15) 0%,
+                    rgba(9, 5, 64, 0.02) 48%,
+                    rgba(0, 0, 18, 0.2) 100%
+                );
+        }
+
+        .splash__content {
+            position: absolute;
+            top: 33.4svh;
+            left: 50%;
+            z-index: 2;
+
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+
+            width: 100%;
+            padding: 0 20px;
+
+            text-align: center;
+            color: #ffffff;
+
+            transform: translateX(-50%);
+        }
+
+        .splash__logo {
+            display: block;
+            width: 148px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        .splash__text {
+            margin-top: 53px;
+        }
+
+        .splash__title {
+            color: #ffffff;
+            font-size: 43px;
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -1.8px;
+            white-space: nowrap;
+        }
+
+        .splash__description {
+            margin-top: 8px;
+
+            color: #ffffff;
+            font-size: 20px;
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: -0.7px;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="splash">
+        <section class="splash__content" aria-label="Con:nect 앱 시작 화면">
+
+            <!-- 흰색 Con:nect 심볼 로고 이미지 -->
+            <img
+                class="splash__logo"
+                src="./Images/logo1.png"
+                alt="Con:nect 로고"
+            >
+
+            <div class="splash__text">
+                <h1 class="splash__title">Con:nect</h1>
+                <p class="splash__description">공연의 시작부터, 여운까지</p>
+            </div>
+
+        </section>
+    </main>
+    <script>
+    setTimeout(function () {
+        window.location.href = "./onboarding.html";
+    }, 3000);
+    </script>
+</body>
+</html>

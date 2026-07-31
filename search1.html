@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>탐색</title>
+
+    <style>
+        :root {
+            --primary: #585fef;
+            --violet: #8a63ff;
+            --pink: #ff6faf;
+            --mint: #34d1bf;
+            --amber: #ffb347;
+
+            --background: #060a27;
+            --surface: #141c3d;
+            --surface-dark: #080d2c;
+            --border: #4e5368;
+
+            --white: #ffffff;
+            --soft-gray: #dbdce6;
+            --muted: #a6aabd;
+
+            --page-padding: 24px;
+            --tabbar-height: 86px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: var(--background);
+            color: var(--white);
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+            background: none;
+        }
+
+        img {
+            display: block;
+        }
+
+        .explore-page {
+            width: 100%;
+            min-height: 100svh;
+            overflow-y: auto;
+            background-color: var(--background);
+        }
+
+        .explore-content {
+            width: 100%;
+            min-height: 100svh;
+            padding:
+                66px
+                var(--page-padding)
+                calc(
+                    var(--tabbar-height) +
+                    48px +
+                    env(safe-area-inset-bottom)
+                );
+        }
+
+        /* 화면 제목 */
+        .page-header {
+            width: 100%;
+        }
+
+        .page-header__title {
+            color: var(--white);
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        /* 검색창 */
+        .search-form {
+            position: relative;
+            width: 100%;
+            height: 51px;
+            margin-top: 22px;
+        }
+
+        .search-form__icon {
+            position: absolute;
+            top: 50%;
+            left: 18px;
+            z-index: 2;
+            width: 21px;
+            height: 21px;
+            object-fit: contain;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .search-form__input {
+            display: block;
+            width: 100%;
+            height: 51px;
+            padding: 0 18px 0 49px;
+
+            border: 1px solid #555b70;
+            border-radius: 14px;
+            outline: none;
+
+            background-color: var(--surface);
+            color: var(--white);
+
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 51px;
+            letter-spacing: -0.35px;
+        }
+
+        .search-form__input::placeholder {
+            color: #d4d6df;
+            opacity: 1;
+        }
+
+        .search-form__input:focus {
+            border-color: var(--violet);
+            box-shadow: 0 0 0 2px rgba(138, 99, 255, 0.14);
+        }
+
+        .search-form__input::-webkit-search-cancel-button {
+            display: none;
+        }
+
+        /* 빠른 필터 */
+        .quick-filter {
+            width: 100%;
+            margin-top: 28px;
+        }
+
+        .section-title {
+            color: var(--white);
+            font-size: 19px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.55px;
+        }
+
+        .quick-filter__chips {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 13px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .quick-filter__chips::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-chip {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            height: 34px;
+            padding: 0 16px;
+
+            border: 1px solid #555b70;
+            border-radius: 999px;
+
+            background-color: var(--surface);
+            color: var(--soft-gray);
+
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .filter-chip--active {
+            border-color: var(--violet);
+            background:
+                linear-gradient(
+                    100deg,
+                    #585fef 0%,
+                    #8a46e3 100%
+                );
+            color: var(--white);
+        }
+
+        .filter-chip:active {
+            opacity: 0.8;
+        }
+
+        /* 상세 필터 이동 버튼 */
+        .filter-more {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            width: 100%;
+            height: 51px;
+            margin-top: 23px;
+            padding: 0 17px;
+
+            border-radius: 13px;
+            background:
+                linear-gradient(
+                    100deg,
+                    #263ca1 0%,
+                    #5318b4 100%
+                );
+        }
+
+        .filter-more__text {
+            color: var(--soft-gray);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1;
+            letter-spacing: -0.4px;
+        }
+
+        .filter-more__icon {
+            width: 23px;
+            height: 23px;
+            object-fit: contain;
+        }
+
+        .filter-more:active {
+            opacity: 0.85;
+        }
+
+        /* 추천 공연 목록 */
+        .recommend-section {
+            width: 100%;
+            margin-top: 26px;
+        }
+
+        .performance-list {
+            display: flex;
+            flex-direction: column;
+            gap: 9px;
+            width: 100%;
+            margin-top: 13px;
+        }
+
+        .performance-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+
+            width: 100%;
+            min-height: 106px;
+            padding: 8px 47px 8px 8px;
+
+            border: 1px solid var(--border);
+            border-radius: 15px;
+
+            background-color: rgba(8, 13, 44, 0.98);
+        }
+
+        .performance-card__main {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            width: 100%;
+        }
+
+        .performance-card__thumbnail {
+            flex-shrink: 0;
+            width: 100px;
+            height: 90px;
+            overflow: hidden;
+            border-radius: 13px;
+            background-color: #251174;
+        }
+
+        .performance-card__image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .performance-card__content {
+            min-width: 0;
+            margin-left: 16px;
+        }
+
+        .performance-card__title {
+            overflow: hidden;
+            color: var(--white);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.35;
+            letter-spacing: -0.35px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .performance-card__info {
+            overflow: hidden;
+            margin-top: 4px;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: -0.35px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .performance-card__status {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+
+            color: var(--mint);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+            letter-spacing: -0.3px;
+        }
+
+        .performance-card__status::before {
+            content: "";
+            flex-shrink: 0;
+            width: 12px;
+            height: 12px;
+            margin-right: 7px;
+            border-radius: 50%;
+            background-color: var(--mint);
+        }
+
+        .bookmark-button {
+            position: absolute;
+            top: 14px;
+            right: 9px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 38px;
+            height: 44px;
+        }
+
+        .bookmark-button__icon {
+            width: 23px;
+            height: 23px;
+            object-fit: contain;
+        }
+
+        /* 공통 하단 탭바 */
+        .tabbar {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+
+            width: 100%;
+            height:
+                calc(
+                    var(--tabbar-height) +
+                    env(safe-area-inset-bottom)
+                );
+
+            padding:
+                8px
+                20px
+                env(safe-area-inset-bottom);
+
+            border-top: 1px solid #4c5268;
+            border-radius: 16px 16px 0 0;
+
+            background-color: #111938;
+        }
+
+        .tabbar__list {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            list-style: none;
+        }
+
+        .tabbar__item {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tabbar__link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 100%;
+
+            color: var(--soft-gray);
+        }
+
+        .tabbar__icon {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .tabbar__label {
+            margin-top: 6px;
+            color: var(--soft-gray);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .tabbar__link--active .tabbar__label {
+            color: var(--violet);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="explore-page">
+
+        <main class="explore-content">
+
+            <!-- 화면 제목 -->
+            <header class="page-header">
+                <h1 class="page-header__title">탐색</h1>
+            </header>
+
+            <!-- 검색창 -->
+            <form
+                class="search-form"
+                action="./search-result.html"
+                method="get"
+            >
+                <img
+                    class="search-form__icon"
+                    src="./Icons/search-2.svg"
+                    alt=""
+                >
+
+                <input
+                    class="search-form__input"
+                    type="search"
+                    name="keyword"
+                    placeholder="공연명, 아티스트 검색"
+                    aria-label="공연명 또는 아티스트 검색"
+                >
+            </form>
+
+            <!-- 빠른 필터 -->
+            <section class="quick-filter">
+                <h2 class="section-title">빠른 필터</h2>
+
+                <nav
+                    class="quick-filter__chips"
+                    aria-label="공연 빠른 필터"
+                >
+                    <a
+                        class="filter-chip filter-chip--active"
+                        href="./search.html"
+                        aria-current="page"
+                    >
+                        전체
+                    </a>
+
+                    <a
+                        class="filter-chip"
+                        href="./search-live-tour.html"
+                    >
+                        라이브투어
+                    </a>
+
+                    <a
+                        class="filter-chip"
+                        href="./search-booking.html"
+                    >
+                        예매 중
+                    </a>
+
+                    <a
+                        class="filter-chip"
+                        href="./search-concert.html"
+                    >
+                        콘서트
+                    </a>
+
+                    <a
+                        class="filter-chip"
+                        href="./search-fanmeeting.html"
+                    >
+                        팬미팅
+                    </a>
+                </nav>
+
+                <a
+                    class="filter-more"
+                    href="./search2.html"
+                >
+                    <span class="filter-more__text">
+                        필터로 더 정확하게 찾기
+                    </span>
+
+                    <img
+                        class="filter-more__icon"
+                        src="./Icons/filter.svg"
+                        alt=""
+                    >
+                </a>
+            </section>
+
+            <!-- 추천 공연 목록 -->
+            <section class="recommend-section">
+                <h2 class="section-title">추천 공연 목록</h2>
+
+                <div class="performance-list">
+
+                    <!-- 공연 카드 1 -->
+                    <article class="performance-card">
+                        <a
+                            class="performance-card__main"
+                            href="./performance-detail.html"
+                        >
+                            <div class="performance-card__thumbnail">
+                                <img
+                                    class="performance-card__image"
+                                    src="./Images/05-1.png"
+                                    alt="STAR FANMEETING 공연 이미지"
+                                >
+                            </div>
+
+                            <div class="performance-card__content">
+                                <h3 class="performance-card__title">
+                                    STAR FANMEETING
+                                </h3>
+
+                                <p class="performance-card__info">
+                                    서울 · 7.31 · 올림픽홀
+                                </p>
+
+                                <p class="performance-card__status">
+                                    예매 오픈
+                                </p>
+                            </div>
+                        </a>
+
+                        <a
+                            class="bookmark-button"
+                            href="./saved-performance.html"
+                            aria-label="STAR FANMEETING 저장 해제"
+                        >
+                            <img
+                                class="bookmark-button__icon"
+                                src="./Icons/bookmark-1.svg"
+                                alt=""
+                            >
+                        </a>
+                    </article>
+
+                    <!-- 공연 카드 2 -->
+                    <article class="performance-card">
+                        <a
+                            class="performance-card__main"
+                            href="./performance-detail.html"
+                        >
+                            <div class="performance-card__thumbnail">
+                                <img
+                                    class="performance-card__image"
+                                    src="./Images/05-2.png"
+                                    alt="AURA FAN PARTY 공연 이미지"
+                                >
+                            </div>
+
+                            <div class="performance-card__content">
+                                <h3 class="performance-card__title">
+                                    AURA FAN PARTY
+                                </h3>
+
+                                <p class="performance-card__info">
+                                    부산 · 8.12 · 아레나
+                                </p>
+
+                                <p class="performance-card__status">
+                                    예매 예정
+                                </p>
+                            </div>
+                        </a>
+
+                        <a
+                            class="bookmark-button"
+                            href="./saved-performance.html"
+                            aria-label="AURA FAN PARTY 저장"
+                        >
+                            <img
+                                class="bookmark-button__icon"
+                                src="./Icons/bookmark-2.svg"
+                                alt=""
+                            >
+                        </a>
+                    </article>
+
+                    <!-- 공연 카드 3 -->
+                    <article class="performance-card">
+                        <a
+                            class="performance-card__main"
+                            href="./performance-detail.html"
+                        >
+                            <div class="performance-card__thumbnail">
+                                <img
+                                    class="performance-card__image"
+                                    src="./Images/05-3.png"
+                                    alt="AURA FAN PARTY 공연장 이미지"
+                                >
+                            </div>
+
+                            <div class="performance-card__content">
+                                <h3 class="performance-card__title">
+                                    AURA FAN PARTY
+                                </h3>
+
+                                <p class="performance-card__info">
+                                    부산 · 8.12 · 아레나
+                                </p>
+
+                                <p class="performance-card__status">
+                                    예매 예정
+                                </p>
+                            </div>
+                        </a>
+
+                        <a
+                            class="bookmark-button"
+                            href="./saved-performance.html"
+                            aria-label="AURA FAN PARTY 저장"
+                        >
+                            <img
+                                class="bookmark-button__icon"
+                                src="./Icons/bookmark-2.svg"
+                                alt=""
+                            >
+                        </a>
+                    </article>
+
+                    <!-- 공연 카드 4 -->
+                    <article class="performance-card">
+                        <a
+                            class="performance-card__main"
+                            href="./performance-detail.html"
+                        >
+                            <div class="performance-card__thumbnail">
+                                <img
+                                    class="performance-card__image"
+                                    src="./Images/05-3.png"
+                                    alt="AURA FAN PARTY 공연장 이미지"
+                                >
+                            </div>
+
+                            <div class="performance-card__content">
+                                <h3 class="performance-card__title">
+                                    AURA FAN PARTY
+                                </h3>
+
+                                <p class="performance-card__info">
+                                    부산 · 8.12 · 아레나
+                                </p>
+
+                                <p class="performance-card__status">
+                                    예매 예정
+                                </p>
+                            </div>
+                        </a>
+
+                        <a
+                            class="bookmark-button"
+                            href="./saved-performance.html"
+                            aria-label="AURA FAN PARTY 저장"
+                        >
+                            <img
+                                class="bookmark-button__icon"
+                                src="./Icons/bookmark-2.svg"
+                                alt=""
+                            >
+                        </a>
+                    </article>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- 공통 하단 탭바 -->
+        <nav class="tabbar" aria-label="주요 메뉴">
+            <ul class="tabbar__list">
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./home.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/home-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">홈</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link tabbar__link--active"
+                        href="./search1.html"
+                        aria-current="page"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/search-1.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">탐색</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./event1.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/bookmark-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">내 공연</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./talk.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/message-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">팬톡</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./my.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/user-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">마이</span>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+    </div>
+</body>
+</html>

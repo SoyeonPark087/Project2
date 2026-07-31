@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>로그인</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            background-color: #050924;
+            color: #ffffff;
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+            cursor: pointer;
+        }
+
+        .login-page {
+            position: relative;
+            isolation: isolate;
+            width: 100%;
+            min-height: 100svh;
+            overflow-y: auto;
+            background-color: #050924;
+        }
+
+        /* 상단 우주 배경 이미지 */
+        .login-page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+
+            width: 100%;
+            height: 340px;
+
+            background-image: url("./Images/03-1.png");
+            background-repeat: no-repeat;
+            background-position: center top;
+            background-size: cover;
+            pointer-events: none;
+            opacity: 0.82;
+        }
+
+        /* 배경 이미지와 본문이 자연스럽게 연결되도록 처리 */
+        .login-page::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+
+            width: 100%;
+            height: 380px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(5, 9, 36, 0.05) 0%,
+                    rgba(5, 9, 36, 0.2) 58%,
+                    #050924 100%
+                );
+            pointer-events: none;
+        }
+
+        .login-page__inner {
+            position: relative;
+            z-index: 2;
+
+            width: 100%;
+            min-height: 100svh;
+            padding:
+                119px
+                24px
+                max(32px, env(safe-area-inset-bottom));
+        }
+
+        /* 로고 및 브랜드 문구 */
+        .brand {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            text-align: center;
+        }
+
+        .brand__logo {
+            display: block;
+            width: 96px;
+            height: 70px;
+            object-fit: contain;
+        }
+
+        .brand__title {
+            margin-top: 10px;
+            color: #ffffff;
+            font-size: 34px;
+            font-weight: 700;
+            line-height: 1.15;
+            letter-spacing: -1.4px;
+        }
+
+        .brand__description {
+            margin-top: 3px;
+            color: #dbdce6;
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 1.45;
+            letter-spacing: -0.4px;
+        }
+
+        /* 로그인 입력 영역 */
+        .login-form {
+            width: 100%;
+            margin-top: 67px;
+        }
+
+        .login-form__field + .login-form__field {
+            margin-top: 9px;
+        }
+
+        .login-form__input {
+            display: block;
+            width: 100%;
+            height: 56px;
+            padding: 0 23px;
+
+            border: 1px solid #5c6070;
+            border-radius: 14px;
+            outline: none;
+
+            background-color: #151d3d;
+            color: #ffffff;
+
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 56px;
+            letter-spacing: -0.3px;
+        }
+
+        .login-form__input::placeholder {
+            color: #ffffff;
+            opacity: 0.9;
+        }
+
+        .login-form__input:focus {
+            border-color: #8a63ff;
+            box-shadow: 0 0 0 2px rgba(138, 99, 255, 0.16);
+        }
+
+        .login-form__input:-webkit-autofill,
+        .login-form__input:-webkit-autofill:hover,
+        .login-form__input:-webkit-autofill:focus {
+            -webkit-text-fill-color: #ffffff;
+            box-shadow: 0 0 0 1000px #151d3d inset;
+            transition: background-color 9999s ease-in-out 0s;
+        }
+
+        /* 로그인 버튼 */
+        .login-form__submit {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 56px;
+            margin-top: 24px;
+
+            border-radius: 13px;
+            background:
+                linear-gradient(
+                    100deg,
+                    #585fef 0%,
+                    #8a63ff 100%
+                );
+
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .login-form__submit:active {
+            opacity: 0.86;
+        }
+
+        /* SNS 로그인 버튼 */
+        .sns-login {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 56px;
+            margin-top: 8px;
+
+            border: 1px solid #8a63ff;
+            border-radius: 13px;
+
+            background-color: transparent;
+            color: #8a63ff;
+
+            font-size: 15px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .sns-login:active {
+            background-color: rgba(138, 99, 255, 0.1);
+        }
+
+        /* 회원가입 및 비밀번호 찾기 */
+        .account-links {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            margin-top: 35px;
+
+            color: #dbdce6;
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        .account-links__item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 44px;
+            padding: 0 8px;
+        }
+
+        .account-links__divider {
+            display: block;
+            width: 1px;
+            height: 16px;
+            margin: 0 2px;
+            background-color: rgba(219, 220, 230, 0.8);
+        }
+
+        .account-links__item:active {
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="login-page">
+        <div class="login-page__inner">
+
+            <!-- 브랜드 영역 -->
+            <header class="brand">
+                <img
+                    class="brand__logo"
+                    src="./Images/logo2.png"
+                    alt="Con:nect 심볼 로고"
+                >
+
+                <h1 class="brand__title">Con:nect</h1>
+
+                <p class="brand__description">
+                    팬의 모든 순간을 연결합니다
+                </p>
+            </header>
+
+            <!-- 로그인 폼 -->
+            <form
+                class="login-form"
+                action="./home.html"
+                method="get"
+            >
+                <div class="login-form__field">
+                    <input
+                        class="login-form__input"
+                        type="text"
+                        name="userId"
+                        placeholder="아이디"
+                        aria-label="아이디"
+                        autocomplete="username"
+                    >
+                </div>
+
+                <div class="login-form__field">
+                    <input
+                        class="login-form__input"
+                        type="password"
+                        name="password"
+                        placeholder="비밀번호"
+                        aria-label="비밀번호"
+                        autocomplete="current-password"
+                    >
+                </div>
+
+                <button
+                    class="login-form__submit"
+                    type="submit"
+                >
+                    로그인하기
+                </button>
+            </form>
+
+            <!-- SNS 로그인 -->
+            <a
+                class="sns-login"
+                href="./sns-login.html"
+            >
+                SNS로 시작하기
+            </a>
+
+            <!-- 계정 관련 링크 -->
+            <nav
+                class="account-links"
+                aria-label="계정 관련 메뉴"
+            >
+                <a
+                    class="account-links__item"
+                    href="./signup.html"
+                >
+                    회원가입하기
+                </a>
+
+                <span
+                    class="account-links__divider"
+                    aria-hidden="true"
+                ></span>
+
+                <a
+                    class="account-links__item"
+                    href="./find-password.html"
+                >
+                    비밀번호 찾기
+                </a>
+            </nav>
+
+        </div>
+    </main>
+</body>
+</html>

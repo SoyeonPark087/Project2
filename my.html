@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>Con:nect 마이페이지</title>
+
+    <style>
+        :root {
+            --color-primary: #585fef;
+            --color-violet: #8a63ff;
+            --color-background: #060a27;
+            --color-surface: #242a43;
+            --color-tabbar: #111938;
+            --color-border: #64697b;
+            --color-white: #ffffff;
+            --color-soft-gray: #dbdce6;
+            --color-muted: #9297aa;
+
+            --page-padding: 24px;
+            --tabbar-height: 86px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: var(--color-background);
+            color: var(--color-white);
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            display: block;
+        }
+
+        .mypage {
+            width: 100%;
+            min-height: 100svh;
+            overflow-y: auto;
+            background-color: var(--color-background);
+        }
+
+        .mypage__content {
+            width: 100%;
+            min-height: 100svh;
+            padding:
+                67px
+                var(--page-padding)
+                calc(
+                    var(--tabbar-height) +
+                    48px +
+                    env(safe-area-inset-bottom)
+                );
+        }
+
+        /* 화면 제목 */
+        .page-header {
+            width: 100%;
+        }
+
+        .page-header__title {
+            color: var(--color-white);
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        /* 사용자 프로필 */
+        .profile-summary {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            margin-top: 27px;
+        }
+
+        .profile-summary__image-wrap {
+            flex-shrink: 0;
+            width: 80px;
+            height: 80px;
+            overflow: hidden;
+            border-radius: 50%;
+            background-color: #252c4b;
+        }
+
+        .profile-summary__image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .profile-summary__content {
+            min-width: 0;
+            margin-left: 17px;
+        }
+
+        .profile-summary__name {
+            overflow: hidden;
+            color: var(--color-white);
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: -0.5px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .profile-summary__status {
+            margin-top: 5px;
+            color: var(--color-muted);
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.4;
+            letter-spacing: -0.3px;
+            white-space: nowrap;
+        }
+
+        /* 마이페이지 메뉴 */
+        .mypage-menu {
+            width: 100%;
+            margin-top: 25px;
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            background-color: var(--color-surface);
+        }
+
+        .mypage-menu__list {
+            width: 100%;
+            list-style: none;
+        }
+
+        .mypage-menu__item {
+            width: 100%;
+        }
+
+        .mypage-menu__item + .mypage-menu__item {
+            border-top: 1px solid rgba(219, 220, 230, 0.38);
+        }
+
+        .mypage-menu__link {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 79px;
+            padding: 0 16px;
+        }
+
+        .mypage-menu__icon-wrap {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background-color: #f0edff;
+        }
+
+        .mypage-menu__icon {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        .mypage-menu__content {
+            flex: 1;
+            min-width: 0;
+            margin-left: 16px;
+        }
+
+        .mypage-menu__title {
+            overflow: hidden;
+            color: var(--color-white);
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1.25;
+            letter-spacing: -0.45px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mypage-menu__description {
+            overflow: hidden;
+            margin-top: 3px;
+            color: var(--color-soft-gray);
+            font-size: 13px;
+            font-weight: 400;
+            line-height: 1.3;
+            letter-spacing: -0.25px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .mypage-menu__arrow {
+            flex-shrink: 0;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            object-fit: contain;
+            opacity: 0.72;
+        }
+
+        .mypage-menu__link:active {
+            background-color: rgba(138, 99, 255, 0.1);
+        }
+
+        /* 공통 하단 탭바 */
+        .tabbar {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+
+            width: 100%;
+            height:
+                calc(
+                    var(--tabbar-height) +
+                    env(safe-area-inset-bottom)
+                );
+
+            padding:
+                8px
+                20px
+                env(safe-area-inset-bottom);
+
+            border-top: 1px solid #4c5268;
+            border-radius: 16px 16px 0 0;
+            background-color: var(--color-tabbar);
+        }
+
+        .tabbar__list {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            list-style: none;
+        }
+
+        .tabbar__item {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tabbar__link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: var(--color-soft-gray);
+        }
+
+        .tabbar__icon {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .tabbar__label {
+            margin-top: 6px;
+            color: var(--color-soft-gray);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .tabbar__link--active .tabbar__label {
+            color: var(--color-violet);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="mypage">
+
+        <main class="mypage__content">
+
+            <!-- 화면 제목 -->
+            <header class="page-header">
+                <h1 class="page-header__title">마이페이지</h1>
+            </header>
+
+            <!-- 사용자 프로필 -->
+            <section class="profile-summary">
+                <div class="profile-summary__image-wrap">
+                    <img
+                        class="profile-summary__image"
+                        src="./Images/profile1.png"
+                        alt="SOYEON 프로필 사진"
+                    >
+                </div>
+
+                <div class="profile-summary__content">
+                    <h2 class="profile-summary__name">SOYEON</h2>
+
+                    <p class="profile-summary__status">
+                        관심 아티스트 5 · 후기 3
+                    </p>
+                </div>
+            </section>
+
+            <!-- 마이페이지 메뉴 -->
+            <nav class="mypage-menu" aria-label="마이페이지 메뉴">
+                <ul class="mypage-menu__list">
+
+                    <!-- 프로필 수정 -->
+                    <li class="mypage-menu__item">
+                        <a
+                            class="mypage-menu__link"
+                            href="./profile-edit.html"
+                        >
+                            <span class="mypage-menu__icon-wrap">
+                                <img
+                                    class="mypage-menu__icon"
+                                    src="./Icons/my-1.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <span class="mypage-menu__content">
+                                <strong class="mypage-menu__title">
+                                    프로필 수정
+                                </strong>
+
+                                <span class="mypage-menu__description">
+                                    닉네임 · 사진 변경
+                                </span>
+                            </span>
+
+                            <img
+                                class="mypage-menu__arrow"
+                                src="./Icons/right.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <!-- 관심 아티스트 -->
+                    <li class="mypage-menu__item">
+                        <a
+                            class="mypage-menu__link"
+                            href="./favorite-artists.html"
+                        >
+                            <span class="mypage-menu__icon-wrap">
+                                <img
+                                    class="mypage-menu__icon"
+                                    src="./Icons/my-2.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <span class="mypage-menu__content">
+                                <strong class="mypage-menu__title">
+                                    관심 아티스트
+                                </strong>
+
+                                <span class="mypage-menu__description">
+                                    내가 찜한 멤버
+                                </span>
+                            </span>
+
+                            <img
+                                class="mypage-menu__arrow"
+                                src="./Icons/right.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <!-- 알림 설정 -->
+                    <li class="mypage-menu__item">
+                        <a
+                            class="mypage-menu__link"
+                            href="./notification-settings.html"
+                        >
+                            <span class="mypage-menu__icon-wrap">
+                                <img
+                                    class="mypage-menu__icon"
+                                    src="./Icons/my-3.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <span class="mypage-menu__content">
+                                <strong class="mypage-menu__title">
+                                    알림 설정
+                                </strong>
+
+                                <span class="mypage-menu__description">
+                                    예매 · D-day · 팬톡
+                                </span>
+                            </span>
+
+                            <img
+                                class="mypage-menu__arrow"
+                                src="./Icons/right.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <!-- 내 활동 -->
+                    <li class="mypage-menu__item">
+                        <a
+                            class="mypage-menu__link"
+                            href="./my-activity.html"
+                        >
+                            <span class="mypage-menu__icon-wrap">
+                                <img
+                                    class="mypage-menu__icon"
+                                    src="./Icons/my-4.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <span class="mypage-menu__content">
+                                <strong class="mypage-menu__title">
+                                    내 활동
+                                </strong>
+
+                                <span class="mypage-menu__description">
+                                    후기 · 댓글 · 동행
+                                </span>
+                            </span>
+
+                            <img
+                                class="mypage-menu__arrow"
+                                src="./Icons/right.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <!-- 앱 설정 -->
+                    <li class="mypage-menu__item">
+                        <a
+                            class="mypage-menu__link"
+                            href="./app-settings.html"
+                        >
+                            <span class="mypage-menu__icon-wrap">
+                                <img
+                                    class="mypage-menu__icon"
+                                    src="./Icons/my-5.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <span class="mypage-menu__content">
+                                <strong class="mypage-menu__title">
+                                    앱 설정
+                                </strong>
+
+                                <span class="mypage-menu__description">
+                                    계정 · 공지 · 고객센터
+                                </span>
+                            </span>
+
+                            <img
+                                class="mypage-menu__arrow"
+                                src="./Icons/right.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                </ul>
+            </nav>
+
+        </main>
+
+        <!-- 공통 하단 탭바 -->
+        <nav class="tabbar" aria-label="주요 메뉴">
+            <ul class="tabbar__list">
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./home.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/home-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">홈</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./search1.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/search-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">탐색</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./event1.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/bookmark-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">내 공연</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./talk.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/message-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">팬톡</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link tabbar__link--active"
+                        href="./my.html"
+                        aria-current="page"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/user-1.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">마이</span>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+
+    </div>
+</body>
+</html>

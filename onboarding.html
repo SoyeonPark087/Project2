@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>온보딩</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            background-color: #070b2b;
+            color: #ffffff;
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .onboarding {
+            width: 100%;
+            min-height: 100svh;
+            overflow-y: auto;
+            background-color: #070b2b;
+        }
+
+        .onboarding__inner {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            min-height: 100svh;
+            padding:
+                51px
+                24px
+                max(22px, env(safe-area-inset-bottom));
+        }
+
+        /* 상단 브랜드 영역 */
+        .brand {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            height: 40px;
+            padding-left: 7px;
+        }
+
+        .brand__symbol {
+            display: block;
+            flex-shrink: 0;
+            width: 51px;
+            height: 40px;
+            object-fit: contain;
+        }
+
+        .brand__name {
+            margin-left: 10px;
+            color: #ffffff;
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.8px;
+            white-space: nowrap;
+        }
+
+        /* 중앙 온보딩 이미지 */
+        .onboarding-visual {
+            position: relative;
+            width: 100%;
+            height: 282px;
+            margin-top: 31px;
+            overflow: hidden;
+            border: 1px solid #8a63ff;
+            border-radius: 16px;
+            background-color: #10154a;
+        }
+
+        .onboarding-visual__image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* 이미지 테두리의 네온 효과 */
+        .onboarding-visual::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: 15px;
+            box-shadow:
+                inset 1px 0 0 rgba(52, 129, 255, 0.85),
+                inset -1px 0 0 rgba(255, 55, 225, 0.85);
+            pointer-events: none;
+        }
+
+        /* 안내 문구 */
+        .onboarding-copy {
+            width: 100%;
+            margin-top: 31px;
+            text-align: center;
+        }
+
+        .onboarding-copy__title {
+            color: #ffffff;
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.22;
+            letter-spacing: -1.2px;
+            word-break: keep-all;
+        }
+
+        .onboarding-copy__description {
+            margin-top: 18px;
+            color: #dbdce6;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.55;
+            letter-spacing: -0.45px;
+            word-break: keep-all;
+        }
+
+        /* 페이지 표시 점 */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 31px;
+        }
+
+        .pagination__dot {
+            display: block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.72);
+        }
+
+        .pagination__dot--active {
+            background-color: #8a63ff;
+        }
+
+        /* 하단 버튼 영역 */
+        .onboarding-actions {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-top: 36px;
+        }
+
+        .onboarding-actions__primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 56px;
+            border-radius: 14px;
+            background-color: #825cff;
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .onboarding-actions__primary:active {
+            background-color: #7049ef;
+        }
+
+        .onboarding-actions__secondary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            align-self: center;
+            min-width: 90px;
+            min-height: 44px;
+            margin-top: 21px;
+            padding: 0 12px;
+            color: #dbdce6;
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1;
+        }
+
+        .onboarding-actions__secondary:active {
+            color: #ffffff;
+        }
+    </style>
+</head>
+
+<body>
+    <main class="onboarding">
+        <div class="onboarding__inner">
+
+            <!-- 상단 로고 -->
+            <header class="brand">
+                <img
+                    class="brand__symbol"
+                    src="./Images/logo2.png"
+                    alt=""
+                >
+
+                <span class="brand__name">Con:next</span>
+            </header>
+
+            <!-- 중앙 이미지 -->
+            <section class="onboarding-visual">
+                <img
+                    class="onboarding-visual__image"
+                    src="./Images/02-1.png"
+                    alt="공연 티켓과 팬 소통을 연결하는 서비스"
+                >
+            </section>
+
+            <!-- 온보딩 설명 -->
+            <section class="onboarding-copy">
+                <h1 class="onboarding-copy__title">
+                    좋아진 공연 정보를<br>
+                    하나로 연결해요
+                </h1>
+
+                <p class="onboarding-copy__description">
+                    공식 정보, 예매, 현장, 후기까지<br>
+                    콘넥트 안에서 이어집니다.
+                </p>
+            </section>
+
+            <!-- 온보딩 페이지 표시 -->
+            <div
+                class="pagination"
+                aria-label="전체 4개 온보딩 중 첫 번째 화면"
+            >
+                <span class="pagination__dot pagination__dot--active"></span>
+                <span class="pagination__dot"></span>
+                <span class="pagination__dot"></span>
+                <span class="pagination__dot"></span>
+            </div>
+
+            <!-- 이동 버튼 -->
+            <nav
+                class="onboarding-actions"
+                aria-label="온보딩 이동"
+            >
+                <a
+                    class="onboarding-actions__primary"
+                    href="./login.html"
+                >
+                    시작하기
+                </a>
+
+                <a
+                    class="onboarding-actions__secondary"
+                    href="./home.html"
+                >
+                    둘러보기
+                </a>
+            </nav>
+
+        </div>
+    </main>
+</body>
+</html>

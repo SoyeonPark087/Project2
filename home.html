@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>홈</title>
+
+    <style>
+        :root {
+            --primary: #585fef;
+            --violet: #8a63ff;
+            --pink: #ff6faf;
+            --mint: #34d1bf;
+            --amber: #ffb347;
+
+            --background: #050924;
+            --surface: #121a39;
+            --surface-dark: #080d2c;
+            --border: #4d5267;
+
+            --white: #ffffff;
+            --soft-gray: #dbdce6;
+            --muted: #9ca1b6;
+
+            --page-padding: 24px;
+            --tabbar-height: 85px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: var(--background);
+            color: var(--white);
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+            background: none;
+        }
+
+        img {
+            display: block;
+        }
+
+        .home-page {
+            position: relative;
+            isolation: isolate;
+            width: 100%;
+            min-height: 100svh;
+            padding-bottom:
+                calc(
+                    var(--tabbar-height) +
+                    32px +
+                    env(safe-area-inset-bottom)
+                );
+            overflow: hidden;
+            background-color: var(--background);
+        }
+
+        /* 상단 우주 배경 */
+        .home-page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            width: 100%;
+            height: 310px;
+            background-image: url("./Images/03-1.png");
+            background-repeat: no-repeat;
+            background-position: center top;
+            background-size: cover;
+            pointer-events: none;
+            opacity: 0.78;
+        }
+
+        /* 상단 배경과 본문을 자연스럽게 연결 */
+        .home-page::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            width: 100%;
+            height: 350px;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(5, 9, 36, 0.05) 0%,
+                    rgba(5, 9, 36, 0.08) 52%,
+                    #050924 100%
+                );
+            pointer-events: none;
+        }
+
+        .home-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            padding:
+                60px
+                var(--page-padding)
+                0;
+        }
+
+        /* 상단 인사말 */
+        .home-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .home-header__greeting {
+            color: var(--white);
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.65px;
+        }
+
+        .home-header__question {
+            margin-top: 2px;
+            color: var(--soft-gray);
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 1.5;
+            letter-spacing: -0.4px;
+        }
+
+        .notification-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            margin-top: 2px;
+        }
+
+        .notification-button__icon {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        /* 검색창 */
+        .search-box {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            margin-top: 25px;
+        }
+
+        .search-box__icon {
+            position: absolute;
+            top: 50%;
+            left: 18px;
+            z-index: 2;
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .search-box__input {
+            display: block;
+            width: 100%;
+            height: 50px;
+            padding: 0 18px 0 50px;
+            border: 1px solid #5c6070;
+            border-radius: 14px;
+            outline: none;
+            background-color: #151d3d;
+            color: var(--white);
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 50px;
+            letter-spacing: -0.35px;
+        }
+
+        .search-box__input::placeholder {
+            color: #d2d4df;
+            opacity: 1;
+        }
+
+        .search-box__input:focus {
+            border-color: var(--violet);
+            box-shadow: 0 0 0 2px rgba(138, 99, 255, 0.14);
+        }
+
+        /* 메인 공연 배너 */
+        .main-banner {
+            position: relative;
+            display: block;
+            width: 100%;
+            height: 196px;
+            margin-top: 24px;
+            overflow: hidden;
+            border-radius: 15px;
+            background-color: #171059;
+        }
+
+        .main-banner__image {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        /* 이미지 위 글자 가독성을 위한 그라데이션 */
+        .main-banner::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(20, 8, 95, 0.82) 0%,
+                    rgba(25, 7, 91, 0.55) 48%,
+                    rgba(15, 5, 66, 0.08) 100%
+                ),
+                linear-gradient(
+                    180deg,
+                    rgba(0, 0, 0, 0.08) 0%,
+                    rgba(0, 0, 0, 0.2) 100%
+                );
+            pointer-events: none;
+        }
+
+        .main-banner__content {
+            position: relative;
+            z-index: 3;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            width: 100%;
+            height: 100%;
+            padding: 26px 25px;
+        }
+
+        .main-banner__category {
+            color: var(--white);
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.35;
+            letter-spacing: -0.45px;
+        }
+
+        .main-banner__title {
+            margin-top: 8px;
+            color: var(--white);
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.06;
+            letter-spacing: -1.1px;
+        }
+
+        .main-banner__badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 23px;
+        }
+
+        .banner-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 29px;
+            padding: 0 15px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .banner-badge--open {
+            background-color: var(--white);
+            color: var(--primary);
+        }
+
+        .banner-badge--dday {
+            min-width: 58px;
+            background-color: var(--amber);
+            color: var(--white);
+        }
+
+        /* 공통 섹션 */
+        .home-section {
+            width: 100%;
+            margin-top: 28px;
+        }
+
+        .home-section__title {
+            color: var(--white);
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.65px;
+        }
+
+        /* 내 공연 현황 */
+        .status-list {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .status-card {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+            height: 80px;
+            padding: 0 15px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background-color: var(--surface);
+        }
+
+        .status-card__label {
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .status-card__number {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .status-card--saved .status-card__number {
+            color: #b89cff;
+        }
+
+        .status-card--reserved .status-card__number {
+            color: var(--mint);
+        }
+
+        .status-card--completed .status-card__number {
+            color: var(--pink);
+        }
+
+        /* 인기 공연 목록 */
+        .popular-section {
+            margin-top: 27px;
+        }
+
+        .performance-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .performance-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 106px;
+            padding: 8px 45px 8px 8px;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background-color: rgba(8, 13, 44, 0.96);
+        }
+
+        .performance-card__thumbnail {
+            flex-shrink: 0;
+            width: 99px;
+            height: 90px;
+            overflow: hidden;
+            border-radius: 13px;
+            background-color: #251174;
+        }
+
+        .performance-card__thumbnail-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .performance-card__content {
+            min-width: 0;
+            margin-left: 16px;
+        }
+
+        .performance-card__title {
+            overflow: hidden;
+            color: var(--white);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.35;
+            letter-spacing: -0.35px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .performance-card__info {
+            margin-top: 4px;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -0.3px;
+            white-space: nowrap;
+        }
+
+        .performance-card__status {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            color: var(--mint);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .performance-card__status::before {
+            content: "";
+            flex-shrink: 0;
+            width: 12px;
+            height: 12px;
+            margin-right: 7px;
+            border-radius: 50%;
+            background-color: var(--mint);
+        }
+
+        .bookmark-button {
+            position: absolute;
+            top: 14px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 44px;
+        }
+
+        .bookmark-button__icon {
+            width: 23px;
+            height: 23px;
+            object-fit: contain;
+        }
+
+        /* 공통 하단 탭바 */
+        .tabbar {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            width: 100%;
+            height:
+                calc(
+                    var(--tabbar-height) +
+                    env(safe-area-inset-bottom)
+                );
+            padding: 9px 20px env(safe-area-inset-bottom);
+            border-top: 1px solid #4c5268;
+            border-radius: 16px 16px 0 0;
+            background-color: #111938;
+        }
+
+        .tabbar__list {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            list-style: none;
+        }
+
+        .tabbar__item {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tabbar__link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: var(--white);
+        }
+
+        .tabbar__icon {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .tabbar__label {
+            margin-top: 6px;
+            color: var(--soft-gray);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .tabbar__link--active .tabbar__label {
+            color: var(--violet);
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="home-page">
+        <main class="home-content">
+
+            <!-- 상단 인사 및 알림 -->
+            <header class="home-header">
+                <div>
+                    <h1 class="home-header__greeting">
+                        안녕하세요, 소연님!
+                    </h1>
+
+                    <p class="home-header__question">
+                        오늘은 어떤 공연을 즐겨볼까요?
+                    </p>
+                </div>
+
+                <a
+                    class="notification-button"
+                    href="./notification.html"
+                    aria-label="알림 보기"
+                >
+                    <img
+                        class="notification-button__icon"
+                        src="./Icons/notifi.svg"
+                        alt=""
+                    >
+                </a>
+            </header>
+
+            <!-- 공연 검색 -->
+            <form
+                class="search-box"
+                action="./search.html"
+                method="get"
+            >
+                <img
+                    class="search-box__icon"
+                    src="./Icons/search-2.svg"
+                    alt=""
+                >
+
+                <input
+                    class="search-box__input"
+                    type="search"
+                    name="keyword"
+                    placeholder="공연명, 아티스트 검색"
+                    aria-label="공연명 또는 아티스트 검색"
+                >
+            </form>
+
+            <!-- 상단 메인 공연 배너 -->
+            <a
+                class="main-banner"
+                href="./performance-detail.html"
+                aria-label="2026 Con:nect Live Tour 공연 상세 보기"
+            >
+                <img
+                    class="main-banner__image"
+                    src="./Images/04-1.png"
+                    alt=""
+                >
+
+                <div class="main-banner__content">
+                    <p class="main-banner__category">라이브 투어</p>
+
+                    <h2 class="main-banner__title">
+                        2026 Con:nect<br>
+                        Live Tour
+                    </h2>
+
+                    <div class="main-banner__badges">
+                        <span class="banner-badge banner-badge--open">
+                            예매 오픈
+                        </span>
+
+                        <span class="banner-badge banner-badge--dday">
+                            D-3
+                        </span>
+                    </div>
+                </div>
+            </a>
+
+            <!-- 내 공연 현황 -->
+            <section class="home-section">
+                <h2 class="home-section__title">내 공연 현황</h2>
+
+                <div class="status-list">
+                    <a
+                        class="status-card status-card--saved"
+                        href="./my-performance.html"
+                    >
+                        <span class="status-card__label">저장</span>
+                        <strong class="status-card__number">4</strong>
+                    </a>
+
+                    <a
+                        class="status-card status-card--reserved"
+                        href="./my-performance.html"
+                    >
+                        <span class="status-card__label">예매</span>
+                        <strong class="status-card__number">1</strong>
+                    </a>
+
+                    <a
+                        class="status-card status-card--completed"
+                        href="./my-performance.html"
+                    >
+                        <span class="status-card__label">완료</span>
+                        <strong class="status-card__number">2</strong>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 이번 주 인기 공연 -->
+            <section class="home-section popular-section">
+                <h2 class="home-section__title">이번주 인기 공연</h2>
+
+                <div class="performance-list">
+
+                    <article class="performance-card">
+                        <a
+                            class="performance-card__thumbnail"
+                            href="./performance-detail.html"
+                            aria-label="STAR FANMEETING 상세 보기"
+                        >
+                            <img
+                                class="performance-card__thumbnail-image"
+                                src="./Images/04-2.png"
+                                alt="보라색 조명의 공연장"
+                            >
+                        </a>
+
+                        <a
+                            class="performance-card__content"
+                            href="./performance-detail.html"
+                        >
+                            <h3 class="performance-card__title">
+                                STAR FANMEETING
+                            </h3>
+
+                            <p class="performance-card__info">
+                                7.27 KSPO DOME
+                            </p>
+
+                            <p class="performance-card__status">
+                                예매 오픈
+                            </p>
+                        </a>
+
+                        <a
+                            class="bookmark-button"
+                            href="./saved-performance.html"
+                            aria-label="저장한 공연 보기"
+                        >
+                            <img
+                                class="bookmark-button__icon"
+                                src="./Icons/bookmark-1.svg"
+                                alt=""
+                            >
+                        </a>
+                    </article>
+
+                    <article class="performance-card">
+                        <a
+                            class="performance-card__thumbnail"
+                            href="./performance-detail.html"
+                            aria-label="STAR FANMEETING 상세 보기"
+                        >
+                            <img
+                                class="performance-card__thumbnail-image"
+                                src="./Images/04-2.png"
+                                alt="보라색 조명의 공연장"
+                            >
+                        </a>
+
+                        <a
+                            class="performance-card__content"
+                            href="./performance-detail.html"
+                        >
+                            <h3 class="performance-card__title">
+                                STAR FANMEETING
+                            </h3>
+
+                            <p class="performance-card__info">
+                                7.27 KSPO DOME
+                            </p>
+
+                            <p class="performance-card__status">
+                                예매 오픈
+                            </p>
+                        </a>
+
+                        <a
+                            class="bookmark-button"
+                            href="./saved-performance.html"
+                            aria-label="공연 저장"
+                        >
+                            <img
+                                class="bookmark-button__icon"
+                                src="./Icons/bookmark-2.svg"
+                                alt=""
+                            >
+                        </a>
+                    </article>
+
+                    <article class="performance-card">
+                        <a
+                            class="performance-card__thumbnail"
+                            href="./performance-detail.html"
+                            aria-label="STAR FANMEETING 상세 보기"
+                        >
+                            <img
+                                class="performance-card__thumbnail-image"
+                                src="./Images/04-2.png"
+                                alt="보라색 조명의 공연장"
+                            >
+                        </a>
+
+                        <a
+                            class="performance-card__content"
+                            href="./performance-detail.html"
+                        >
+                            <h3 class="performance-card__title">
+                                STAR FANMEETING
+                            </h3>
+
+                            <p class="performance-card__info">
+                                7.27 KSPO DOME
+                            </p>
+
+                            <p class="performance-card__status">
+                                예매 오픈
+                            </p>
+                        </a>
+
+                        <a
+                            class="bookmark-button"
+                            href="./saved-performance.html"
+                            aria-label="공연 저장"
+                        >
+                            <img
+                                class="bookmark-button__icon"
+                                src="./Icons/bookmark-2.svg"
+                                alt=""
+                            >
+                        </a>
+                    </article>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- 공통 하단 탭바 -->
+        <nav class="tabbar" aria-label="주요 메뉴">
+            <ul class="tabbar__list">
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link tabbar__link--active"
+                        href="./home.html"
+                        aria-current="page"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/home-1.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">홈</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./search1.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/search-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">탐색</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./event1.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/bookmark-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">내 공연</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./talk.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/message-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">팬톡</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./my.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/user-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">마이</span>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+</body>
+</html>
