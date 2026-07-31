@@ -90,9 +90,13 @@
         .onboarding-visual {
             position: relative;
             width: 100%;
-            height: 282px;
+
+            /* 시안의 이미지 영역 비율: 약 327 × 282 */
+            aspect-ratio: 327 / 282;
+
             margin-top: 31px;
             overflow: hidden;
+
             border: 1px solid #8a63ff;
             border-radius: 16px;
             background-color: #10154a;
@@ -102,10 +106,11 @@
             display: block;
             width: 100%;
             height: 100%;
+
             object-fit: cover;
             object-position: center;
         }
-
+        
         /* 이미지 테두리의 네온 효과 */
         .onboarding-visual::after {
             content: "";
