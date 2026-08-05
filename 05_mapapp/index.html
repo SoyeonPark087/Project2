@@ -2,7 +2,10 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
     <title>검색결과</title>
 
     <style>
@@ -38,15 +41,14 @@
         }
 
         .app {
-            width: 375px;
-            height: 100svh;
-            min-height: 667px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-rows: 81px minmax(0, 1fr) 106px;
-            overflow: hidden;
-            background: #ffffff;
-        }
+    width: 100%;
+    height: 100svh;
+    margin: 0;
+    display: grid;
+    grid-template-rows: 81px minmax(0, 1fr) 106px;
+    overflow: hidden;
+    background: #ffffff;
+}
 
         /* 상단 내비게이션 */
         .top-navigation {
