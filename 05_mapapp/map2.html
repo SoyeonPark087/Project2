@@ -2,7 +2,10 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+>
     <title>망원한강공원 지도</title>
 
     <style>
@@ -38,15 +41,18 @@
         }
 
         .app {
-            width: 375px;
-            height: 100svh;
-            min-height: 667px;
-            margin: 0 auto;
-            display: grid;
-            grid-template-rows: minmax(0, 1fr) 148px;
-            overflow: hidden;
-            background: #ffffff;
-        }
+    width: 100%;
+    height: 100svh;
+    display: grid;
+    grid-template-rows: minmax(0, 1fr) 148px;
+    overflow: hidden;
+    background: #ffffff;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
 
         /* 지도 */
         .map-section {
@@ -57,7 +63,7 @@
         }
 
         #map {
-            width: 375px;
+            width: 100%;
             height: 100%;
         }
 
@@ -107,6 +113,32 @@
             width: 21px;
             height: 21px;
             object-fit: contain;
+        }
+
+        /* 현재 위치에서 선택 장소까지 길찾기 */
+        .route-button {
+            position: absolute;
+            right: 72px;
+            bottom: 18px;
+            min-width: 76px;
+            height: 39px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 20px;
+            background: #4d70bd;
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: -0.3px;
+            box-shadow: 0 2px 7px rgba(0, 0, 0, 0.18);
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .route-button:active {
+            transform: scale(0.97);
         }
 
         /* 하단 장소 카드 */
@@ -283,6 +315,91 @@
             visibility: visible;
             transform: translate(-50%, 0);
         }
+        [hidden] {
+            display: none !important;
+        }
+
+        /* 길찾기 이동수단 선택 바텀시트 */
+        .route-layer {
+            position: absolute;
+            inset: 0;
+            z-index: 100;
+        }
+
+        .route-dimmed {
+            position: absolute;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.42);
+        }
+
+        .route-sheet {
+            position: absolute;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 10px 20px 24px;
+            border-radius: 20px 20px 0 0;
+            background: #ffffff;
+        }
+
+        .route-sheet-handle {
+            width: 40px;
+            height: 4px;
+            margin: 0 auto 18px;
+            border-radius: 999px;
+            background: #d8d8d8;
+        }
+
+        .route-sheet-title {
+            font-size: 18px;
+            line-height: 24px;
+            font-weight: 700;
+            letter-spacing: -0.4px;
+        }
+
+        .route-sheet-description {
+            margin-top: 5px;
+            font-size: 13px;
+            line-height: 19px;
+            color: #666666;
+        }
+
+        .route-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .route-option {
+            height: 48px;
+            border: 1px solid #dfe3ec;
+            border-radius: 10px;
+            background: #ffffff;
+            color: #222222;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .route-option:active {
+            border-color: #4d70bd;
+            background: #f0f4ff;
+            color: #355da9;
+        }
+
+        .route-cancel-button {
+            width: 100%;
+            height: 48px;
+            margin-top: 10px;
+            border-radius: 10px;
+            background: #f2f3f6;
+            color: #333333;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
         /* 지도만 보여주는 화면 */
 .app.map-only {
     grid-template-rows: minmax(0, 1fr);
@@ -316,6 +433,15 @@
             aria-label="현재 위치로 이동"
         >
             <img src="./Icons/gps.svg" alt="">
+        </button>
+
+        <button
+            type="button"
+            class="route-button"
+            id="routeButton"
+            aria-label="현재 위치에서 선택한 장소까지 길찾기"
+        >
+            길찾기
         </button>
 
         <div class="toast" id="toast" role="status"></div>
@@ -360,6 +486,58 @@
     </span>
 </article>
 
+    <div class="route-layer" id="routeLayer" hidden>
+        <button
+            type="button"
+            class="route-dimmed"
+            id="routeDimmed"
+            aria-label="길찾기 창 닫기"
+        ></button>
+
+        <section
+            class="route-sheet"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="routeSheetTitle"
+        >
+            <div class="route-sheet-handle" aria-hidden="true"></div>
+
+            <h2 class="route-sheet-title" id="routeSheetTitle">
+                이동수단을 선택하세요
+            </h2>
+
+            <p class="route-sheet-description">
+                현재 위치를 출발지로 설정해 카카오맵 길찾기를 실행합니다.
+            </p>
+
+            <div class="route-options">
+                <button type="button" class="route-option" data-route-mode="car">
+                    자동차
+                </button>
+
+                <button type="button" class="route-option" data-route-mode="traffic">
+                    대중교통
+                </button>
+
+                <button type="button" class="route-option" data-route-mode="walk">
+                    도보
+                </button>
+
+                <button type="button" class="route-option" data-route-mode="bicycle">
+                    자전거
+                </button>
+            </div>
+
+            <button
+                type="button"
+                class="route-cancel-button"
+                id="routeCancelButton"
+            >
+                취소
+            </button>
+        </section>
+    </div>
+
 </div>
 
 <!--
@@ -376,66 +554,66 @@
      * latitude와 longitude는 실제 좌표로 수정하세요.
      */
     const places = {
-    mangwon: {
-        name: "망원한강공원",
-        address: "서울 마포구 망원동 205-4",
-        image: "./Images/main.png",
-        tags: ["차크닉", "주차장"],
-        distance: "11.1km",
-        latitude: 37.5523,
-        longitude: 126.8992
-    },
+        mangwon: {
+            name: "망원한강공원",
+            address: "서울 마포구 망원동 205-4",
+            image: "./Images/main.png",
+            tags: ["차크닉", "주차장"],
+            distance: "11.1km",
+            latitude: 37.5523,
+            longitude: 126.8992
+        },
 
-    gwanggyo: {
-        name: "광교호수공원",
-        address: "경기도 수원시 영통구 광교호수로 165",
-        image: "./Images/main-1.png",
-        tags: ["도심", "주차장"],
-        distance: "26km",
-        latitude: 37.2850,
-        longitude: 127.0655
-    },
+        gwanggyo: {
+            name: "광교호수공원",
+            address: "경기도 수원시 영통구 광교호수로 165",
+            image: "./Images/main-1.png",
+            tags: ["도심", "주차장"],
+            distance: "26km",
+            latitude: 37.2850,
+            longitude: 127.0655
+        },
 
-    gangneung: {
-        name: "강릉 야머데기",
-        address: "대거리 2214-207",
-        image: "./Images/main-2.png",
-        tags: ["오션뷰", "주차장"],
-        distance: "108km",
-        latitude: 37.7519,
-        longitude: 128.8761
-    },
+        gangneung: {
+            name: "강릉 야머데기",
+            address: "대거리 2214-207",
+            image: "./Images/main-2.png",
+            tags: ["오션뷰", "주차장"],
+            distance: "108km",
+            latitude: 37.7519,
+            longitude: 128.8761
+        },
 
-    gungpyeong: {
-        name: "화성 궁평항",
-        address: "경기도 화성시 서신면 궁평항로 1049-24",
-        image: "./Images/main-3.png",
-        tags: ["차크닉", "주차장"],
-        distance: "58km",
-        latitude: 37.1167,
-        longitude: 126.6827
-    },
+        gungpyeong: {
+            name: "화성 궁평항",
+            address: "경기도 화성시 서신면 궁평항로 1049-24",
+            image: "./Images/main-3.png",
+            tags: ["차크닉", "주차장"],
+            distance: "58km",
+            latitude: 37.1167,
+            longitude: 126.6827
+        },
 
-    donnaeko: {
-        name: "서귀포 돈내코",
-        address: "제주특별자치도 서귀포시 돈내코로 114",
-        image: "./Images/main-4.png",
-        tags: ["이색", "주차장"],
-        distance: "483km",
-        latitude: 33.3003,
-        longitude: 126.5848
-    },
+        donnaeko: {
+            name: "서귀포 돈내코",
+            address: "제주특별자치도 서귀포시 돈내코로 114",
+            image: "./Images/main-4.png",
+            tags: ["이색", "주차장"],
+            distance: "483km",
+            latitude: 33.3003,
+            longitude: 126.5848
+        },
 
-    masian: {
-        name: "영종도 마시안해변",
-        address: "인천광역시 중구 덕교동 662-9",
-        image: "./Images/main-5.png",
-        tags: ["수도권", "주차장"],
-        distance: "32km",
-        latitude: 37.4268,
-        longitude: 126.4150
-    }
-};
+        masian: {
+            name: "영종도 마시안해변",
+            address: "인천광역시 중구 덕교동 662-9",
+            image: "./Images/main-5.png",
+            tags: ["수도권", "주차장"],
+            distance: "32km",
+            latitude: 37.4268,
+            longitude: 126.4150
+        }
+    };
 
     /*
      * 주소에서 id 값을 가져옵니다.
@@ -659,6 +837,102 @@
             1800
         );
     }
+
+    function openRouteSheet() {
+        const routeLayer = document.getElementById("routeLayer");
+        routeLayer.hidden = false;
+    }
+
+    function closeRouteSheet() {
+        const routeLayer = document.getElementById("routeLayer");
+        routeLayer.hidden = true;
+    }
+
+    function startDirections(routeMode) {
+        closeRouteSheet();
+
+        if (!navigator.geolocation) {
+            showToast("현재 위치 기능을 지원하지 않는 기기입니다.");
+            return;
+        }
+
+        showToast("현재 위치를 확인하고 있습니다.");
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const startLatitude = position.coords.latitude;
+                const startLongitude = position.coords.longitude;
+
+                const startPoint =
+                    encodeURIComponent("현재 위치") +
+                    "," +
+                    startLatitude +
+                    "," +
+                    startLongitude;
+
+                const destinationPoint =
+                    encodeURIComponent(selectedPlace.name) +
+                    "," +
+                    selectedPlace.latitude +
+                    "," +
+                    selectedPlace.longitude;
+
+                const routeUrl =
+                    "https://map.kakao.com/link/by/" +
+                    routeMode +
+                    "/" +
+                    startPoint +
+                    "/" +
+                    destinationPoint;
+
+                window.location.href = routeUrl;
+            },
+            function (error) {
+                let message = "현재 위치를 가져오지 못했습니다.";
+
+                if (error.code === error.PERMISSION_DENIED) {
+                    message = "길찾기를 사용하려면 위치 권한을 허용해 주세요.";
+                } else if (error.code === error.POSITION_UNAVAILABLE) {
+                    message = "현재 위치 정보를 사용할 수 없습니다.";
+                } else if (error.code === error.TIMEOUT) {
+                    message = "현재 위치 확인 시간이 초과되었습니다.";
+                }
+
+                showToast(message);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 30000
+            }
+        );
+    }
+
+    document
+        .getElementById("routeButton")
+        .addEventListener("click", openRouteSheet);
+
+    document
+        .getElementById("routeDimmed")
+        .addEventListener("click", closeRouteSheet);
+
+    document
+        .getElementById("routeCancelButton")
+        .addEventListener("click", closeRouteSheet);
+
+    document
+        .querySelectorAll(".route-option")
+        .forEach(function (button) {
+            button.addEventListener("click", function () {
+                startDirections(button.dataset.routeMode);
+            });
+        });
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Escape") {
+            closeRouteSheet();
+        }
+    });
 
     document
         .getElementById("currentLocationButton")
