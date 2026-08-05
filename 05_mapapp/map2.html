@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=375, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>망원한강공원 지도</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+            background: #e8e8e8;
+            color: #111111;
+        }
+
+        button,
+        a {
+            font: inherit;
+            color: inherit;
+        }
+
+        button {
+            border: 0;
+            background: none;
+        }
+
+        .app {
+            width: 375px;
+            height: 100svh;
+            min-height: 667px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-rows: minmax(0, 1fr) 148px;
+            overflow: hidden;
+            background: #ffffff;
+        }
+
+        /* 지도 */
+        .map-section {
+            position: relative;
+            min-height: 0;
+            overflow: hidden;
+            background: #dce8e9;
+        }
+
+        #map {
+            width: 375px;
+            height: 100%;
+        }
+
+        /* 지도 위 뒤로가기 */
+        .map-back-button {
+            position: absolute;
+            top: 35px;
+            left: 18px;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            z-index: 20;
+            text-decoration: none;
+        }
+
+        .map-back-button img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        /* 현재 위치 버튼 */
+        .current-location-button {
+            position: absolute;
+            right: 23px;
+            bottom: 18px;
+            width: 39px;
+            height: 39px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            background: #ffffff;
+            box-shadow: 0 2px 7px rgba(0, 0, 0, 0.17);
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        .current-location-button:active {
+            transform: scale(0.96);
+        }
+
+        .current-location-button img {
+            width: 21px;
+            height: 21px;
+            object-fit: contain;
+        }
+
+        /* 하단 장소 카드 */
+        .place-card {
+            position: relative;
+            display: flex;
+            gap: 14px;
+            width: 100%;
+            height: 148px;
+            padding: 24px;
+            border-top: 1px solid #ededed;
+            background: #ffffff;
+            z-index: 30;
+        }
+
+        .place-image {
+            flex: 0 0 auto;
+            width: 100px;
+            height: 100px;
+            border-radius: 8px;
+            object-fit: cover;
+            background: #eeeeee;
+        }
+
+        .place-information {
+            min-width: 0;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding-right: 34px;
+        }
+
+        .place-name {
+            overflow: hidden;
+            margin-top: 1px;
+            font-size: 17px;
+            line-height: 22px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .place-address {
+            overflow: hidden;
+            margin-top: 2px;
+            font-size: 13px;
+            line-height: 18px;
+            font-weight: 400;
+            letter-spacing: -0.25px;
+            color: #222222;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .place-tags {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin-top: auto;
+            padding-right: 30px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 25px;
+            padding: 0 9px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 1;
+            font-weight: 500;
+            letter-spacing: -0.2px;
+            color: #ffffff;
+            background: #5874ba;
+            white-space: nowrap;
+        }
+
+        .bookmark-button {
+            position: absolute;
+            top: 22px;
+            right: 24px;
+            width: 32px;
+            height: 40px;
+            display: flex;
+            align-items: flex-start;
+            justify-content: flex-end;
+            cursor: pointer;
+        }
+
+        .bookmark-button img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+        }
+
+        .distance {
+            position: absolute;
+            right: 24px;
+            bottom: 25px;
+            font-size: 16px;
+            line-height: 22px;
+            font-weight: 500;
+            color: #4d6fba;
+            white-space: nowrap;
+        }
+
+        /* 지도 위치 표시 */
+        .place-marker {
+            position: relative;
+            transform: translateY(-8px);
+        }
+
+        .place-marker-label {
+            display: inline-flex;
+            align-items: center;
+            height: 30px;
+            padding: 0 11px;
+            border: 1px solid #496db9;
+            border-radius: 15px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #355da9;
+            background: #ffffff;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.16);
+            white-space: nowrap;
+        }
+
+        .place-marker-dot {
+            width: 14px;
+            height: 14px;
+            margin: 4px auto 0;
+            border: 4px solid #ffffff;
+            border-radius: 50%;
+            background: #4d70bd;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+        }
+
+        .current-marker {
+            width: 20px;
+            height: 20px;
+            border: 5px solid #ffffff;
+            border-radius: 50%;
+            background: #4e72c3;
+            box-shadow: 0 1px 7px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 알림 메시지 */
+        .toast {
+            position: absolute;
+            left: 50%;
+            bottom: 72px;
+            max-width: 310px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            line-height: 18px;
+            color: #ffffff;
+            background: rgba(20, 20, 20, 0.86);
+            opacity: 0;
+            visibility: hidden;
+            transform: translate(-50%, 8px);
+            transition:
+                opacity 0.2s ease,
+                transform 0.2s ease,
+                visibility 0.2s ease;
+            z-index: 40;
+            white-space: nowrap;
+        }
+
+        .toast.is-visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 0);
+        }
+        /* 지도만 보여주는 화면 */
+.app.map-only {
+    grid-template-rows: minmax(0, 1fr);
+}
+
+/* 지도만 보여줄 때 하단 장소 카드 숨김 */
+.app.map-only .place-card {
+    display: none;
+}
+    </style>
+</head>
+
+<body>
+<div class="app" id="app">
+
+    <section class="map-section">
+        <div id="map" aria-label="망원한강공원 지도"></div>
+
+        <a
+            href="./index.html"
+            class="map-back-button"
+            aria-label="검색결과로 돌아가기"
+        >
+            <img src="./Icons/back.svg" alt="">
+        </a>
+
+        <button
+            type="button"
+            class="current-location-button"
+            id="currentLocationButton"
+            aria-label="현재 위치로 이동"
+        >
+            <img src="./Icons/gps.svg" alt="">
+        </button>
+
+        <div class="toast" id="toast" role="status"></div>
+    </section>
+
+    <article class="place-card">
+    <img
+        class="place-image"
+        id="placeImage"
+        src="./Images/main.png"
+        alt=""
+    >
+
+    <div class="place-information">
+        <h1 class="place-name" id="placeName">
+            망원한강공원
+        </h1>
+
+        <p class="place-address" id="placeAddress">
+            서울 마포구 망원동 205-4
+        </p>
+
+        <div class="place-tags" id="placeTags"></div>
+    </div>
+
+    <button
+        type="button"
+        class="bookmark-button"
+        id="bookmarkButton"
+        aria-label="장소 북마크"
+        aria-pressed="false"
+    >
+        <img
+            id="bookmarkIcon"
+            src="./Icons/save.svg"
+            alt=""
+        >
+    </button>
+
+    <span class="distance" id="placeDistance">
+        11.1km
+    </span>
+</article>
+
+</div>
+
+<!--
+    YOUR_KAKAO_JAVASCRIPT_KEY 부분에
+    카카오맵 JavaScript 키를 입력하세요.
+-->
+<script
+    type="text/javascript"
+    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=18c8508b256818bfd7519b07216214dc">
+</script>
+<script>
+    /*
+     * 모든 장소 정보를 한 곳에서 관리합니다.
+     * latitude와 longitude는 실제 좌표로 수정하세요.
+     */
+    const places = {
+    mangwon: {
+        name: "망원한강공원",
+        address: "서울 마포구 망원동 205-4",
+        image: "./Images/main.png",
+        tags: ["차크닉", "주차장"],
+        distance: "11.1km",
+        latitude: 37.5523,
+        longitude: 126.8992
+    },
+
+    gwanggyo: {
+        name: "광교호수공원",
+        address: "경기도 수원시 영통구 광교호수로 165",
+        image: "./Images/main-1.png",
+        tags: ["도심", "주차장"],
+        distance: "26km",
+        latitude: 37.2850,
+        longitude: 127.0655
+    },
+
+    gangneung: {
+        name: "강릉 야머데기",
+        address: "대거리 2214-207",
+        image: "./Images/main-2.png",
+        tags: ["오션뷰", "주차장"],
+        distance: "108km",
+        latitude: 37.7519,
+        longitude: 128.8761
+    },
+
+    gungpyeong: {
+        name: "화성 궁평항",
+        address: "경기도 화성시 서신면 궁평항로 1049-24",
+        image: "./Images/main-3.png",
+        tags: ["차크닉", "주차장"],
+        distance: "58km",
+        latitude: 37.1167,
+        longitude: 126.6827
+    },
+
+    donnaeko: {
+        name: "서귀포 돈내코",
+        address: "제주특별자치도 서귀포시 돈내코로 114",
+        image: "./Images/main-4.png",
+        tags: ["이색", "주차장"],
+        distance: "483km",
+        latitude: 33.3003,
+        longitude: 126.5848
+    },
+
+    masian: {
+        name: "영종도 마시안해변",
+        address: "인천광역시 중구 덕교동 662-9",
+        image: "./Images/main-5.png",
+        tags: ["수도권", "주차장"],
+        distance: "32km",
+        latitude: 37.4268,
+        longitude: 126.4150
+    }
+};
+
+    /*
+     * 주소에서 id 값을 가져옵니다.
+     * 예: map.html?id=gwanggyo
+     */
+    const queryString = new URLSearchParams(
+        window.location.search
+    );
+
+    const selectedPlaceId =
+        queryString.get("id") || "mangwon";
+
+    /*
+     * 존재하지 않는 ID가 전달되면
+     * 기본값으로 망원한강공원을 표시합니다.
+     */
+    const selectedPlace =
+        places[selectedPlaceId] || places.mangwon;
+
+    let map;
+    let currentLocationOverlay = null;
+    let toastTimer;
+
+    function updatePlaceInformation() {
+        const placeImage =
+            document.getElementById("placeImage");
+
+        const placeName =
+            document.getElementById("placeName");
+
+        const placeAddress =
+            document.getElementById("placeAddress");
+
+        const placeTags =
+            document.getElementById("placeTags");
+
+        const placeDistance =
+            document.getElementById("placeDistance");
+
+        const bookmarkButton =
+            document.getElementById("bookmarkButton");
+
+        document.title = selectedPlace.name + " 지도";
+
+        placeImage.src = selectedPlace.image;
+        placeImage.alt = selectedPlace.name;
+
+        placeName.textContent = selectedPlace.name;
+        placeAddress.textContent = selectedPlace.address;
+        placeDistance.textContent = selectedPlace.distance;
+
+        bookmarkButton.setAttribute(
+            "aria-label",
+            selectedPlace.name + " 북마크"
+        );
+
+        placeTags.innerHTML = "";
+
+        selectedPlace.tags.forEach(function (tagName) {
+            const tag = document.createElement("span");
+
+            tag.className = "tag";
+            tag.textContent = tagName;
+
+            placeTags.appendChild(tag);
+        });
+    }
+
+    function initializeMap() {
+        const mapContainer =
+            document.getElementById("map");
+
+        const selectedPosition =
+            new kakao.maps.LatLng(
+                selectedPlace.latitude,
+                selectedPlace.longitude
+            );
+
+        const mapOptions = {
+            center: selectedPosition,
+            level: 4
+        };
+
+        map = new kakao.maps.Map(
+            mapContainer,
+            mapOptions
+        );
+
+        createPlaceMarker(selectedPosition);
+
+        setTimeout(function () {
+            map.relayout();
+            map.setCenter(selectedPosition);
+        }, 100);
+    }
+
+    function createPlaceMarker(position) {
+        const markerContent =
+            document.createElement("div");
+
+        markerContent.className = "place-marker";
+
+        const label =
+            document.createElement("div");
+
+        label.className = "place-marker-label";
+        label.textContent = selectedPlace.name;
+
+        const markerDot =
+            document.createElement("div");
+
+        markerDot.className = "place-marker-dot";
+
+        markerContent.appendChild(label);
+        markerContent.appendChild(markerDot);
+
+        const customOverlay =
+            new kakao.maps.CustomOverlay({
+                position: position,
+                content: markerContent,
+                xAnchor: 0.5,
+                yAnchor: 1
+            });
+
+        customOverlay.setMap(map);
+    }
+
+    function moveToCurrentLocation() {
+        if (!navigator.geolocation) {
+            showToast(
+                "현재 위치 기능을 지원하지 않는 기기입니다."
+            );
+            return;
+        }
+
+        showToast("현재 위치를 확인하고 있습니다.");
+
+        navigator.geolocation.getCurrentPosition(
+            function (position) {
+                const currentPosition =
+                    new kakao.maps.LatLng(
+                        position.coords.latitude,
+                        position.coords.longitude
+                    );
+
+                map.panTo(currentPosition);
+
+                if (currentLocationOverlay) {
+                    currentLocationOverlay.setMap(null);
+                }
+
+                const markerElement =
+                    document.createElement("div");
+
+                markerElement.className =
+                    "current-marker";
+
+                currentLocationOverlay =
+                    new kakao.maps.CustomOverlay({
+                        position: currentPosition,
+                        content: markerElement,
+                        xAnchor: 0.5,
+                        yAnchor: 0.5
+                    });
+
+                currentLocationOverlay.setMap(map);
+
+                showToast(
+                    "현재 위치로 이동했습니다."
+                );
+            },
+            function (error) {
+                let message =
+                    "현재 위치를 가져오지 못했습니다.";
+
+                if (
+                    error.code ===
+                    error.PERMISSION_DENIED
+                ) {
+                    message =
+                        "위치 권한을 허용해 주세요.";
+                } else if (
+                    error.code ===
+                    error.POSITION_UNAVAILABLE
+                ) {
+                    message =
+                        "현재 위치 정보를 사용할 수 없습니다.";
+                } else if (
+                    error.code ===
+                    error.TIMEOUT
+                ) {
+                    message =
+                        "위치 확인 시간이 초과되었습니다.";
+                }
+
+                showToast(message);
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 30000
+            }
+        );
+    }
+
+    function showToast(message) {
+        const toast =
+            document.getElementById("toast");
+
+        window.clearTimeout(toastTimer);
+
+        toast.textContent = message;
+        toast.classList.add("is-visible");
+
+        toastTimer = window.setTimeout(
+            function () {
+                toast.classList.remove(
+                    "is-visible"
+                );
+            },
+            1800
+        );
+    }
+
+    document
+        .getElementById("currentLocationButton")
+        .addEventListener(
+            "click",
+            moveToCurrentLocation
+        );
+
+    document
+        .getElementById("bookmarkButton")
+        .addEventListener(
+            "click",
+            function () {
+                const button = this;
+
+                const icon =
+                    document.getElementById(
+                        "bookmarkIcon"
+                    );
+
+                const isSaved =
+                    button.getAttribute(
+                        "aria-pressed"
+                    ) === "true";
+
+                button.setAttribute(
+                    "aria-pressed",
+                    String(!isSaved)
+                );
+
+                icon.src = isSaved
+                    ? "./Images/icon-bookmark.svg"
+                    : "./Images/icon-bookmark-active.svg";
+            }
+        );
+
+    window.addEventListener("load", function () {
+        updatePlaceInformation();
+
+        if (
+            typeof kakao === "undefined" ||
+            typeof kakao.maps === "undefined"
+        ) {
+            showToast(
+                "카카오맵 API 키를 확인해 주세요."
+            );
+            return;
+        }
+
+        initializeMap();
+    });
+</script>
+</body>
+</html>
