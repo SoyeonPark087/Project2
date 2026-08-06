@@ -1,0 +1,1852 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>홈</title>
+
+    <!-- Swiper CSS -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/swiper@11.2.10/swiper-bundle.min.css"
+    >
+
+    <style>
+        :root {
+            --primary: #585fef;
+            --violet: #8a63ff;
+            --pink: #ff6faf;
+            --mint: #34d1bf;
+            --amber: #ffb347;
+
+            --background: #050924;
+            --surface: #121a39;
+            --surface-dark: #080d2c;
+            --border: #4d5267;
+
+            --white: #ffffff;
+            --soft-gray: #dbdce6;
+            --muted: #9ca1b6;
+
+            --page-padding: 24px;
+            --tabbar-height: 85px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: var(--background);
+            color: var(--white);
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+            background: none;
+        }
+
+        img {
+            display: block;
+        }
+
+        .home-page {
+            position: relative;
+            isolation: isolate;
+            width: 100%;
+            min-height: 100svh;
+            padding-bottom:
+                calc(
+                    var(--tabbar-height) +
+                    32px +
+                    env(safe-area-inset-bottom)
+                );
+            overflow: hidden;
+            background-color: var(--background);
+        }
+
+        /* 상단 우주 배경 */
+        .home-page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+            width: 100%;
+            height: 310px;
+            background-image: url("./Images/03-1.png");
+            background-repeat: no-repeat;
+            background-position: center top;
+            background-size: cover;
+            pointer-events: none;
+            opacity: 0.78;
+        }
+
+        /* 상단 배경과 본문을 자연스럽게 연결 */
+        .home-page::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+            width: 100%;
+            height: 350px;
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(5, 9, 36, 0.05) 0%,
+                    rgba(5, 9, 36, 0.08) 52%,
+                    #050924 100%
+                );
+            pointer-events: none;
+        }
+
+        .home-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            padding:
+                60px
+                var(--page-padding)
+                0;
+        }
+
+        /* 상단 인사말 */
+        .home-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .home-header__greeting {
+            color: var(--white);
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.65px;
+        }
+
+        .home-header__question {
+            margin-top: 2px;
+            color: var(--soft-gray);
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 1.5;
+            letter-spacing: -0.4px;
+        }
+
+        .notification-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 44px;
+            height: 44px;
+            margin-top: 2px;
+        }
+
+        .notification-button__icon {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        /* 검색창 */
+        .search-box {
+            position: relative;
+            width: 100%;
+            height: 50px;
+            margin-top: 25px;
+        }
+
+        .search-box__icon {
+            position: absolute;
+            top: 50%;
+            left: 18px;
+            z-index: 2;
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .search-box__input {
+            display: block;
+            width: 100%;
+            height: 50px;
+            padding: 0 18px 0 50px;
+            border: 1px solid #5c6070;
+            border-radius: 14px;
+            outline: none;
+            background-color: #151d3d;
+            color: var(--white);
+            font-size: 15px;
+            font-weight: 400;
+            line-height: 50px;
+            letter-spacing: -0.35px;
+        }
+
+        .search-box__input::placeholder {
+            color: #d2d4df;
+            opacity: 1;
+        }
+
+        .search-box__input:focus {
+            border-color: var(--violet);
+            box-shadow: 0 0 0 2px rgba(138, 99, 255, 0.14);
+        }
+
+        /* 메인 배너 슬라이드 */
+        .main-banner-section {
+            width: 100%;
+            margin-top: 24px;
+        }
+
+        .main-banner-swiper {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 327 / 195;
+            overflow: hidden;
+            border-radius: 15px;
+            background-color: #171059;
+            isolation: isolate;
+            touch-action: pan-y;
+        }
+
+        .main-banner-swiper .swiper-wrapper {
+            width: 100%;
+            height: 100%;
+        }
+
+        .main-banner-slide {
+            display: block;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: #171059;
+        }
+
+        .main-banner__image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+            user-select: none;
+            pointer-events: none;
+            -webkit-user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        /* 좌우 방향 버튼 */
+        .main-banner-prev,
+        .main-banner-next {
+            position: absolute;
+            top: 50%;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 52px;
+            padding: 0;
+            border: 0;
+            border-radius: 12px;
+            background-color: rgba(5, 9, 36, 0.32);
+            transform: translateY(-50%);
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+        }
+
+        .main-banner-prev {
+            left: 6px;
+        }
+
+        .main-banner-next {
+            right: 6px;
+        }
+
+        .main-banner-prev::before,
+        .main-banner-next::before {
+            content: "";
+            width: 13px;
+            height: 13px;
+        }
+
+        .main-banner-prev::before {
+            margin-left: 5px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.92);
+            border-left: 2px solid rgba(255, 255, 255, 0.92);
+            transform: rotate(45deg);
+        }
+
+        .main-banner-next::before {
+            margin-right: 5px;
+            border-top: 2px solid rgba(255, 255, 255, 0.92);
+            border-right: 2px solid rgba(255, 255, 255, 0.92);
+            transform: rotate(45deg);
+        }
+
+        .main-banner-prev:active,
+        .main-banner-next:active {
+            background-color: rgba(5, 9, 36, 0.66);
+        }
+
+        /* 하단 페이지 버튼 */
+        .main-banner-pagination {
+            position: absolute;
+            right: 0;
+            bottom: 11px;
+            left: 0;
+            z-index: 20;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .main-banner-pagination .swiper-pagination-bullet {
+            width: 7px;
+            height: 7px;
+            margin: 0 4px !important;
+            border: 0;
+            border-radius: 999px;
+            background-color: rgba(255, 255, 255, 0.58);
+            opacity: 1;
+            transition:
+                width 0.25s ease,
+                background-color 0.25s ease;
+        }
+
+        .main-banner-pagination .swiper-pagination-bullet-active {
+            width: 20px;
+            background-color: var(--mint);
+        }
+
+        .main-banner-slide:focus-visible,
+        .main-banner-prev:focus-visible,
+        .main-banner-next:focus-visible,
+        .main-banner-pagination .swiper-pagination-bullet:focus-visible {
+            outline: 2px solid var(--mint);
+            outline-offset: -2px;
+        }
+
+        /* 공통 섹션 */
+        .home-section {
+            width: 100%;
+            margin-top: 28px;
+        }
+
+        .home-section__title {
+            color: var(--white);
+            font-size: 20px;
+            font-weight: 500;
+            line-height: 1.4;
+            letter-spacing: -0.65px;
+        }
+
+        /* 내 공연 현황 */
+        .status-list {
+            display: flex;
+            gap: 15px;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .status-card {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+            height: 80px;
+            padding: 0 15px;
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            background-color: var(--surface);
+        }
+
+        .status-card__label {
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.3;
+        }
+
+        .status-card__number {
+            margin-top: 10px;
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .status-card--saved .status-card__number {
+            color: #b89cff;
+        }
+
+        .status-card--reserved .status-card__number {
+            color: var(--mint);
+        }
+
+        .status-card--completed .status-card__number {
+            color: var(--pink);
+        }
+
+        /* 인기 공연 목록 */
+        .popular-section {
+            margin-top: 27px;
+        }
+
+        .performance-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .performance-card {
+            position: relative;
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 106px;
+            padding: 8px 45px 8px 8px;
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background-color: rgba(8, 13, 44, 0.96);
+        }
+
+        .performance-card__thumbnail {
+            flex-shrink: 0;
+            width: 99px;
+            height: 90px;
+            overflow: hidden;
+            border-radius: 13px;
+            background-color: #251174;
+        }
+
+        .performance-card__thumbnail-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .performance-card__content {
+            min-width: 0;
+            margin-left: 16px;
+        }
+
+        .performance-card__title {
+            overflow: hidden;
+            color: var(--white);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.35;
+            letter-spacing: -0.35px;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .performance-card__info {
+            margin-top: 4px;
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -0.3px;
+            white-space: nowrap;
+        }
+
+        .performance-card__status {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            color: var(--mint);
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .performance-card__status::before {
+            content: "";
+            flex-shrink: 0;
+            width: 12px;
+            height: 12px;
+            margin-right: 7px;
+            border-radius: 50%;
+            background-color: var(--mint);
+        }
+
+        .bookmark-button {
+            position: absolute;
+            top: 14px;
+            right: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 36px;
+            height: 44px;
+        }
+
+        .bookmark-button__icon {
+            width: 23px;
+            height: 23px;
+            object-fit: contain;
+        }
+
+        /* 공통 하단 탭바 */
+        .tabbar {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 100;
+            width: 100%;
+            height:
+                calc(
+                    var(--tabbar-height) +
+                    env(safe-area-inset-bottom)
+                );
+            padding: 9px 20px env(safe-area-inset-bottom);
+            border-top: 1px solid #4c5268;
+            border-radius: 16px 16px 0 0;
+            background-color: #111938;
+        }
+
+        .tabbar__list {
+            display: flex;
+            align-items: stretch;
+            justify-content: space-between;
+            width: 100%;
+            height: 100%;
+            list-style: none;
+        }
+
+        .tabbar__item {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .tabbar__link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            color: var(--white);
+        }
+
+        .tabbar__icon {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .tabbar__label {
+            margin-top: 6px;
+            color: var(--soft-gray);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .tabbar__link--active .tabbar__label {
+            color: var(--violet);
+            font-weight: 600;
+        }
+        body.notification-menu-open {
+            overflow: hidden;
+            touch-action: none;
+        }
+
+        .notification-open-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background-color: transparent;
+            cursor: pointer;
+        }
+
+        .notification-open-button img {
+            display: block;
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .notification-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            width: 100%;
+            height: 100svh;
+            padding: 0;
+            border: 0;
+            background-color: rgba(0, 4, 20, 0.62);
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition:
+                opacity 0.3s ease,
+                visibility 0.3s ease;
+        }
+
+        .notification-backdrop.is-open {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .notification-drawer {
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 110;
+            display: flex;
+            flex-direction: column;
+            width: 80%;
+            height: 100svh;
+            overflow: hidden;
+            border-radius: 28px 0 0 28px;
+            background-color: #ffffff;
+            color: #101525;
+            box-shadow: -14px 0 34px rgba(0, 0, 0, 0.26);
+            transform: translateX(105%);
+            transition:
+                transform 0.36s cubic-bezier(0.22, 0.75, 0.18, 1);
+        }
+
+        .notification-drawer.is-open {
+            transform: translateX(0);
+        }
+
+        .notification-drawer__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-shrink: 0;
+            padding:
+                max(58px, calc(env(safe-area-inset-top) + 24px))
+                28px
+                22px;
+        }
+
+        .notification-drawer__title {
+            margin: 0;
+            color: #101525;
+            font-size: 31px;
+            font-weight: 700;
+        }
+
+        .notification-drawer__close {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background-color: transparent;
+            cursor: pointer;
+        }
+
+        .notification-drawer__close img {
+            width: 27px;
+            height: 27px;
+            object-fit: contain;
+        }
+        /* ==============================
+   알림 분류 탭
+============================== */
+
+.notification-tabs {
+    display: flex;
+    align-items: stretch;
+    flex-shrink: 0;
+
+    width: 100%;
+    height: 70px;
+    padding: 0 22px;
+
+    border-bottom: 1px solid #e5e7ed;
+    background-color: #ffffff;
+}
+
+.notification-tabs__button {
+    position: relative;
+
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 0;
+    padding: 0;
+    border: 0;
+
+    background-color: transparent;
+    color: #656a77;
+
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1;
+
+    cursor: pointer;
+}
+
+.notification-tabs__button--active {
+    color: #7e92dc;
+}
+
+.notification-tabs__button--active::after {
+    content: "";
+
+    position: absolute;
+    right: 5px;
+    bottom: -1px;
+    left: 5px;
+
+    height: 3px;
+
+    border-radius: 999px 999px 0 0;
+    background-color: #416aff;
+
+    box-shadow: 0 3px 8px rgba(65, 106, 255, 0.22);
+}
+
+
+/* ==============================
+   알림 목록 스크롤 영역
+============================== */
+
+.notification-drawer__body {
+    flex: 1;
+    min-height: 0;
+
+    overflow-x: hidden;
+    overflow-y: auto;
+
+    padding: 26px 20px 28px;
+
+    background-color: #ffffff;
+
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+.notification-drawer__body::-webkit-scrollbar {
+    display: none;
+}
+
+.notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    width: 100%;
+
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+}
+
+.notification-item {
+    width: 100%;
+}
+
+.notification-item[hidden] {
+    display: none;
+}
+
+
+/* ==============================
+   개별 알림 카드
+============================== */
+
+.notification-card {
+    position: relative;
+
+    display: flex;
+    align-items: flex-start;
+
+    width: 100%;
+    min-height: 156px;
+
+    padding: 22px 42px 18px 20px;
+
+    border: 1px solid #dfe2e9;
+    border-radius: 15px;
+
+    background-color: #ffffff;
+    color: #111624;
+
+    text-decoration: none;
+
+    box-shadow:
+        0 4px 12px rgba(18, 24, 42, 0.035);
+}
+
+.notification-card:active {
+    background-color: #f8f9fc;
+}
+
+.notification-card__icon-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+
+    width: 60px;
+    height: 60px;
+
+    border-radius: 50%;
+}
+
+.notification-card__icon-wrap--booking {
+    background-color: #e9efff;
+}
+
+.notification-card__icon-wrap--dday {
+    background-color: #eaf8ef;
+}
+
+.notification-card__icon-wrap--fan {
+    background-color: #f4ebff;
+}
+
+.notification-card__icon-wrap--goods {
+    background-color: #fff2e3;
+}
+
+.notification-card__icon-wrap--notice {
+    background-color: #ffedf8;
+}
+
+.notification-card__icon {
+    display: block;
+
+    width: 31px;
+    height: 31px;
+
+    object-fit: contain;
+}
+
+.notification-card__content {
+    display: block;
+    flex: 1;
+    min-width: 0;
+
+    margin-left: 17px;
+}
+
+.notification-card__title {
+    display: block;
+
+    color: #111624;
+
+    font-size: 18px;
+    font-weight: 700;
+    line-height: 1.35;
+    letter-spacing: -0.5px;
+}
+
+.notification-card__description {
+    display: block;
+
+    margin-top: 10px;
+
+    color: #4f5461;
+
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.55;
+    letter-spacing: -0.35px;
+
+    word-break: keep-all;
+}
+
+.notification-card__time {
+    display: block;
+
+    margin-top: 12px;
+
+    color: #7a7f8c;
+    text-align: right;
+
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1;
+}
+
+.notification-card__arrow {
+    position: absolute;
+    top: 35px;
+    right: 17px;
+
+    width: 18px;
+    height: 18px;
+
+    object-fit: contain;
+}
+
+
+/* ==============================
+   하단 알림 설정
+============================== */
+
+.notification-settings {
+    flex-shrink: 0;
+
+    width: 100%;
+
+    padding-bottom: env(safe-area-inset-bottom);
+
+    border-top: 1px solid #e3e5eb;
+    background-color: #ffffff;
+}
+
+.notification-settings__link {
+    display: flex;
+    align-items: center;
+
+    width: 100%;
+    height: 86px;
+
+    padding: 0 26px;
+
+    color: #111624;
+    text-decoration: none;
+}
+
+.notification-settings__link:active {
+    background-color: #f5f6f9;
+}
+
+.notification-settings__icon {
+    flex-shrink: 0;
+
+    width: 28px;
+    height: 28px;
+
+    object-fit: contain;
+}
+
+.notification-settings__label {
+    flex: 1;
+
+    margin-left: 18px;
+
+    color: #111624;
+
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.notification-settings__arrow {
+    flex-shrink: 0;
+
+    width: 19px;
+    height: 19px;
+
+    object-fit: contain;
+}
+    </style>
+</head>
+<body>
+    <div class="home-page">
+        <main class="home-content">
+
+            <!-- 상단 인사 및 알림 -->
+            <header class="home-header">
+                <div>
+                    <h1 class="home-header__greeting">
+                        안녕하세요, 소연님!
+                    </h1>
+
+                    <p class="home-header__question">
+                        오늘은 어떤 공연을 즐겨볼까요?
+                    </p>
+                </div>
+
+            <button
+                id="openNotificationButton"
+                class="notification-open-button"
+                type="button"
+                aria-label="알림 메뉴 열기"
+                aria-controls="notificationDrawer"
+                aria-expanded="false"
+                >
+                <img
+                    src="./Icons/notifi.svg"
+                    alt="알림메뉴"
+                >
+            </button>
+            </header>
+
+            <!-- 공연 검색 -->
+            <form
+                class="search-box"
+                action="./search.html"
+                method="get"
+            >
+                <img
+                    class="search-box__icon"
+                    src="./Icons/search-2.svg"
+                    alt=""
+                >
+
+                <input
+                    class="search-box__input"
+                    type="search"
+                    name="keyword"
+                    placeholder="공연명, 아티스트 검색"
+                    aria-label="공연명 또는 아티스트 검색"
+                >
+            </form>
+
+            <!-- 상단 메인 배너 슬라이드 -->
+            <section
+                class="main-banner-section"
+                aria-label="Con:nect 주요 소식"
+            >
+                <div class="swiper main-banner-swiper">
+                    <div class="swiper-wrapper">
+
+                        <!-- 배너 1 -->
+                        <a
+                            class="swiper-slide main-banner-slide"
+                            href="./performance-detail.html"
+                            aria-label="2026 Con:nect Live Tour 공연 상세 보기"
+                        >
+                            <img
+                                class="main-banner__image"
+                                src="./Images/main_banner01.png"
+                                alt="2026 Con:nect Live Tour 팬 전용 선예매 오픈"
+                            >
+                        </a>
+
+                        <!-- 배너 2 -->
+                        <a
+                            class="swiper-slide main-banner-slide"
+                            href="./goods-booth.html"
+                            aria-label="Con:nect 공식 굿즈 자세히 보기"
+                        >
+                            <img
+                                class="main-banner__image"
+                                src="./Images/main_banner02.png"
+                                alt="Con:nect 공식 굿즈 한정 드롭"
+                            >
+                        </a>
+
+                        <!-- 배너 3 -->
+                        <a
+                            class="swiper-slide main-banner-slide"
+                            href="./app-guide.html"
+                            aria-label="Con:nect 앱 서비스 자세히 보기"
+                        >
+                            <img
+                                class="main-banner__image"
+                                src="./Images/main_banner03.png"
+                                alt="Con:nect 앱 공연 알림 팬톡 굿즈 소식 안내"
+                            >
+                        </a>
+
+                    </div>
+
+                    <!-- 이전 방향 버튼 -->
+                    <button
+                        class="main-banner-prev"
+                        type="button"
+                        aria-label="이전 배너 보기"
+                    ></button>
+
+                    <!-- 다음 방향 버튼 -->
+                    <button
+                        class="main-banner-next"
+                        type="button"
+                        aria-label="다음 배너 보기"
+                    ></button>
+
+                    <!-- 페이지 버튼 -->
+                    <div
+                        class="main-banner-pagination"
+                        aria-label="배너 페이지 선택"
+                    ></div>
+                </div>
+            </section>
+
+            <!-- 내 공연 현황 -->
+            <section class="home-section">
+                <h2 class="home-section__title">내 공연 현황</h2>
+
+                <div class="status-list">
+                    <a
+                        class="status-card status-card--saved"
+                        href="./my-performance.html"
+                    >
+                        <span class="status-card__label">저장</span>
+                        <strong class="status-card__number">4</strong>
+                    </a>
+
+                    <a
+                        class="status-card status-card--reserved"
+                        href="./my-performance.html"
+                    >
+                        <span class="status-card__label">예매</span>
+                        <strong class="status-card__number">1</strong>
+                    </a>
+
+                    <a
+                        class="status-card status-card--completed"
+                        href="./my-performance.html"
+                    >
+                        <span class="status-card__label">완료</span>
+                        <strong class="status-card__number">2</strong>
+                    </a>
+                </div>
+            </section>
+
+            <!-- 이번 주 인기 공연 -->
+            <section class="home-section popular-section">
+                <h2 class="home-section__title">이번주 인기 공연</h2>
+
+                <div class="performance-list">
+
+                    <article class="performance-card">
+                        <a
+                            class="performance-card__thumbnail"
+                            href="./performance-detail.html"
+                            aria-label="STAR FANMEETING 상세 보기"
+                        >
+                            <img
+                                class="performance-card__thumbnail-image"
+                                src="./Images/04-2.png"
+                                alt="보라색 조명의 공연장"
+                            >
+                        </a>
+
+                        <a
+                            class="performance-card__content"
+                            href="./performance-detail.html"
+                        >
+                            <h3 class="performance-card__title">
+                                STAR FANMEETING
+                            </h3>
+
+                            <p class="performance-card__info">
+                                7.27 KSPO DOME
+                            </p>
+
+                            <p class="performance-card__status">
+                                예매 오픈
+                            </p>
+                        </a>
+
+                        <a
+                            class="bookmark-button"
+                            href="./saved-performance.html"
+                            aria-label="저장한 공연 보기"
+                        >
+                            <img
+                                class="bookmark-button__icon"
+                                src="./Icons/bookmark-1.svg"
+                                alt=""
+                            >
+                        </a>
+                    </article>
+
+                    <article class="performance-card">
+                        <a
+                            class="performance-card__thumbnail"
+                            href="./performance-detail.html"
+                            aria-label="STAR FANMEETING 상세 보기"
+                        >
+                            <img
+                                class="performance-card__thumbnail-image"
+                                src="./Images/04-2.png"
+                                alt="보라색 조명의 공연장"
+                            >
+                        </a>
+
+                        <a
+                            class="performance-card__content"
+                            href="./performance-detail.html"
+                        >
+                            <h3 class="performance-card__title">
+                                STAR FANMEETING
+                            </h3>
+
+                            <p class="performance-card__info">
+                                7.27 KSPO DOME
+                            </p>
+
+                            <p class="performance-card__status">
+                                예매 오픈
+                            </p>
+                        </a>
+
+                        <a
+                            class="bookmark-button"
+                            href="./saved-performance.html"
+                            aria-label="공연 저장"
+                        >
+                            <img
+                                class="bookmark-button__icon"
+                                src="./Icons/bookmark-2.svg"
+                                alt=""
+                            >
+                        </a>
+                    </article>
+
+                    <article class="performance-card">
+                        <a
+                            class="performance-card__thumbnail"
+                            href="./performance-detail.html"
+                            aria-label="STAR FANMEETING 상세 보기"
+                        >
+                            <img
+                                class="performance-card__thumbnail-image"
+                                src="./Images/04-2.png"
+                                alt="보라색 조명의 공연장"
+                            >
+                        </a>
+
+                        <a
+                            class="performance-card__content"
+                            href="./performance-detail.html"
+                        >
+                            <h3 class="performance-card__title">
+                                STAR FANMEETING
+                            </h3>
+
+                            <p class="performance-card__info">
+                                7.27 KSPO DOME
+                            </p>
+
+                            <p class="performance-card__status">
+                                예매 오픈
+                            </p>
+                        </a>
+
+                        <a
+                            class="bookmark-button"
+                            href="./saved-performance.html"
+                            aria-label="공연 저장"
+                        >
+                            <img
+                                class="bookmark-button__icon"
+                                src="./Icons/bookmark-2.svg"
+                                alt=""
+                            >
+                        </a>
+                    </article>
+
+                </div>
+            </section>
+
+        </main>
+
+        <!-- 공통 하단 탭바 -->
+        <nav class="tabbar" aria-label="주요 메뉴">
+            <ul class="tabbar__list">
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link tabbar__link--active"
+                        href="./home.html"
+                        aria-current="page"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/home-1.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">홈</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./search1.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/search-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">탐색</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./event1.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/bookmark-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">내 공연</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./talk.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/message-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">팬톡</span>
+                    </a>
+                </li>
+
+                <li class="tabbar__item">
+                    <a
+                        class="tabbar__link"
+                        href="./my.html"
+                    >
+                        <img
+                            class="tabbar__icon"
+                            src="./Icons/user-2.svg"
+                            alt=""
+                        >
+                        <span class="tabbar__label">마이</span>
+                    </a>
+                </li>
+
+            </ul>
+        </nav>
+    </div>
+    <button
+        id="notificationBackdrop"
+        class="notification-backdrop"
+        type="button"
+        aria-label="알림 메뉴 닫기"
+        tabindex="-1"
+    ></button>
+
+    <aside
+        id="notificationDrawer"
+        class="notification-drawer"
+        aria-hidden="true"
+    >
+        <header class="notification-drawer__header">
+            <h2 class="notification-drawer__title">알림</h2>
+
+            <button
+                id="closeNotificationButton"
+                class="notification-drawer__close"
+                type="button"
+                aria-label="알림 메뉴 닫기"
+            >
+                <img
+                    src= "./Icons/close.svg"
+                    alt= "닫기"
+                >
+            </button>
+        </header>
+        <nav class="notification-tabs" aria-label="알림 분류">
+    <button
+        class="notification-tabs__button notification-tabs__button--active"
+        type="button"
+        data-category="all"
+    >
+        전체
+    </button>
+
+    <button
+        class="notification-tabs__button"
+        type="button"
+        data-category="booking"
+    >
+        예매
+    </button>
+
+    <button
+        class="notification-tabs__button"
+        type="button"
+        data-category="fan"
+    >
+        팬톡
+    </button>
+
+    <button
+        class="notification-tabs__button"
+        type="button"
+        data-category="notice"
+    >
+        공지
+    </button>
+</nav>
+
+          <div class="notification-drawer__body">
+                <ul class="notification-list">
+
+                    <li
+                        class="notification-item"
+                        data-notification-category="booking"
+                    >
+                        <a
+                            class="notification-card"
+                            href="./performance-detail.html"
+                        >
+                            <span
+                                class="notification-card__icon-wrap notification-card__icon-wrap--booking"
+                            >
+                                <img
+                                    class="notification-card__icon"
+                                    src="./Icons/ticket.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <span class="notification-card__content">
+                                <strong class="notification-card__title">
+                                    예매 오픈 알림
+                                </strong>
+
+                                <span class="notification-card__description">
+                                    2025 CON:NECT LIVE 예매가<br>
+                                    오픈되었습니다.
+                                </span>
+
+                                <time class="notification-card__time">
+                                    10분 전
+                                </time>
+                            </span>
+
+                            <img
+                                class="notification-card__arrow"
+                                src="./Icons/rightgray.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <li
+                        class="notification-item"
+                        data-notification-category="booking"
+                    >
+                        <a
+                            class="notification-card"
+                            href="./my-performance.html"
+                        >
+                            <span
+                                class="notification-card__icon-wrap notification-card__icon-wrap--dday"
+                            >
+                                <img
+                                    class="notification-card__icon"
+                                    src="./Icons/calendar-2.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <span class="notification-card__content">
+                                <strong class="notification-card__title">
+                                    D-3 공연 준비
+                                </strong>
+
+                                <span class="notification-card__description">
+                                    공연이 D-3일 남았습니다.<br>
+                                    티켓과 일정 확인을 잊지 마세요!
+                                </span>
+
+                                <time class="notification-card__time">
+                                    1시간 전
+                                </time>
+                            </span>
+
+                            <img
+                                class="notification-card__arrow"
+                                src="./Icons/rightgray.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <li
+                        class="notification-item"
+                        data-notification-category="fan"
+                    >
+                        <a
+                            class="notification-card"
+                            href="./fan-talk.html"
+                        >
+                            <span
+                                class="notification-card__icon-wrap notification-card__icon-wrap--fan"
+                            >
+                                <img
+                                    class="notification-card__icon"
+                                    src="./Icons/message-1.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <span class="notification-card__content">
+                                <strong class="notification-card__title">
+                                    팬톡 새 댓글
+                                </strong>
+
+                                <span class="notification-card__description">
+                                    아티스트가 회원님의 팬톡에<br>
+                                    댓글을 남겼습니다.
+                                </span>
+
+                                <time class="notification-card__time">
+                                    3시간 전
+                                </time>
+                            </span>
+
+                            <img
+                                class="notification-card__arrow"
+                                src="./Icons/rightgray.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <li
+                        class="notification-item"
+                        data-notification-category="notice"
+                    >
+                        <a
+                            class="notification-card"
+                            href="./goods-booth.html"
+                        >
+                            <span
+                                class="notification-card__icon-wrap notification-card__icon-wrap--goods"
+                            >
+                                <img
+                                    class="notification-card__icon"
+                                    src="./Icons/shopping.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <span class="notification-card__content">
+                                <strong class="notification-card__title">
+                                    굿즈 판매 공지
+                                </strong>
+
+                                <span class="notification-card__description">
+                                    새로운 굿즈가 출시되었습니다.<br>
+                                    지금 확인해보세요!
+                                </span>
+
+                                <time class="notification-card__time">
+                                    1일 전
+                                </time>
+                            </span>
+
+                            <img
+                                class="notification-card__arrow"
+                                src="./Icons/rightgray.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                    <li
+                        class="notification-item"
+                        data-notification-category="notice"
+                    >
+                        <a
+                            class="notification-card"
+                            href="./notice.html"
+                        >
+                            <span
+                                class="notification-card__icon-wrap notification-card__icon-wrap--notice"
+                            >
+                                <img
+                                    class="notification-card__icon"
+                                    src="./Icons/speakerphone.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <span class="notification-card__content">
+                                <strong class="notification-card__title">
+                                    공지사항 업데이트
+                                </strong>
+
+                                <span class="notification-card__description">
+                                    회원 혜택 관련 공지사항이<br>
+                                    업데이트되었습니다.
+                                </span>
+
+                                <time class="notification-card__time">
+                                    2일 전
+                                </time>
+                            </span>
+
+                            <img
+                                class="notification-card__arrow"
+                                src="./Icons/rightgray.svg"
+                                alt=""
+                            >
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+
+            <!-- 알림 설정 -->
+            <footer class="notification-settings">
+                <a
+                    class="notification-settings__link"
+                    href="./notification.html"
+                >
+                    <img
+                        class="notification-settings__icon"
+                        src="./Icons/setting.svg"
+                        alt=""
+                    >
+
+                    <span class="notification-settings__label">
+                        알림 설정
+                    </span>
+
+                    <img
+                        class="notification-settings__arrow"
+                        src="./Icons/rightgray.svg"
+                        alt=""
+                    >
+                </a>
+            </footer>
+        </aside>
+    <!-- Swiper JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11.2.10/swiper-bundle.min.js"></script>
+
+    <script>
+        /* 메인 배너 슬라이드 */
+        const mainBannerSwiper = new Swiper(".main-banner-swiper", {
+            slidesPerView: 1,
+            slidesPerGroup: 1,
+            spaceBetween: 0,
+            loop: true,
+            speed: 600,
+
+            autoplay: {
+                delay: 3000,
+                disableOnInteraction: false,
+                pauseOnMouseEnter: false,
+                stopOnLastSlide: false,
+                waitForTransition: true
+            },
+
+            navigation: {
+                prevEl: ".main-banner-prev",
+                nextEl: ".main-banner-next"
+            },
+
+            pagination: {
+                el: ".main-banner-pagination",
+                clickable: true,
+                type: "bullets",
+                bulletElement: "button"
+            },
+
+            allowTouchMove: true,
+            simulateTouch: true,
+            preventInteractionOnTransition: false,
+            observer: true,
+            observeParents: true,
+            watchOverflow: false,
+
+            a11y: {
+                enabled: true,
+                prevSlideMessage: "이전 배너",
+                nextSlideMessage: "다음 배너",
+                paginationBulletMessage: "{{index}}번째 배너로 이동"
+            }
+        });
+
+        /* 백그라운드에서 돌아왔을 때 자동재생 복구 */
+        document.addEventListener("visibilitychange", function () {
+            if (
+                !document.hidden &&
+                mainBannerSwiper &&
+                !mainBannerSwiper.destroyed
+            ) {
+                mainBannerSwiper.autoplay.start();
+            }
+        });
+
+        const openNotificationButton =
+            document.getElementById("openNotificationButton");
+
+        const closeNotificationButton =
+            document.getElementById("closeNotificationButton");
+
+        const notificationDrawer =
+            document.getElementById("notificationDrawer");
+
+        const notificationBackdrop =
+            document.getElementById("notificationBackdrop");
+
+        const notificationTabButtons =
+    document.querySelectorAll(".notification-tabs__button");
+
+const notificationItems =
+    document.querySelectorAll(".notification-item");
+
+const notificationDrawerBody =
+    document.querySelector(".notification-drawer__body");
+
+function filterNotifications(category) {
+    notificationTabButtons.forEach(function (button) {
+        const isActive =
+            button.dataset.category === category;
+
+        button.classList.toggle(
+            "notification-tabs__button--active",
+            isActive
+        );
+
+        button.setAttribute(
+            "aria-selected",
+            String(isActive)
+        );
+    });
+
+    notificationItems.forEach(function (item) {
+        const itemCategory =
+            item.dataset.notificationCategory;
+
+        const shouldShow =
+            category === "all" ||
+            itemCategory === category;
+
+        item.hidden = !shouldShow;
+    });
+
+    notificationDrawerBody.scrollTop = 0;
+}
+
+notificationTabButtons.forEach(function (button) {
+    button.addEventListener("click", function () {
+        filterNotifications(
+            button.dataset.category
+        );
+    });
+});
+
+filterNotifications("all");
+
+        function openNotificationMenu() {
+            document.body.classList.add(
+                "notification-menu-open"
+            );
+
+            notificationDrawer.classList.add("is-open");
+            notificationBackdrop.classList.add("is-open");
+
+            notificationDrawer.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+
+            openNotificationButton.setAttribute(
+                "aria-expanded",
+                "true"
+            );
+        }
+
+        function closeNotificationMenu() {
+            document.body.classList.remove(
+                "notification-menu-open"
+            );
+
+            notificationDrawer.classList.remove("is-open");
+            notificationBackdrop.classList.remove("is-open");
+
+            notificationDrawer.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+
+            openNotificationButton.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+        }
+
+        openNotificationButton.addEventListener(
+            "click",
+            openNotificationMenu
+        );
+
+        closeNotificationButton.addEventListener(
+            "click",
+            closeNotificationMenu
+        );
+
+        notificationBackdrop.addEventListener(
+            "click",
+            closeNotificationMenu
+        );
+
+        document.addEventListener("keydown", function (event) {
+            if (
+                event.key === "Escape" &&
+                notificationDrawer.classList.contains("is-open")
+            ) {
+                closeNotificationMenu();
+            }
+        });
+    </script>
+</body>
+</html>

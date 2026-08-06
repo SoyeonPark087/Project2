@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    >
+
+    <title>알림 설정</title>
+
+    <style>
+        :root {
+            --primary: #585fef;
+            --violet: #8a63ff;
+            --pink: #ff6faf;
+
+            --background: #050924;
+            --surface: #111936;
+            --surface-light: #18203f;
+            --border: #4c536a;
+
+            --white: #ffffff;
+            --soft-gray: #dbdce6;
+            --muted: #969caf;
+            --disabled: #72788c;
+
+            --page-padding: 24px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+
+            background-color: var(--background);
+            color: var(--white);
+
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body.is-time-panel-open {
+            overflow: hidden;
+        }
+
+        button,
+        input {
+            margin: 0;
+            padding: 0;
+            border: 0;
+            outline: none;
+            background: none;
+            color: inherit;
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            display: block;
+        }
+
+        .notification-page {
+            position: relative;
+            width: 100%;
+            min-height: 100svh;
+
+            overflow-x: hidden;
+            background-color: var(--background);
+        }
+
+        /* 상단 은은한 우주 배경 */
+        .notification-page::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 0;
+
+            width: 100%;
+            height: 360px;
+
+            background-image: url("./Images/notification-space-background.png");
+            background-repeat: no-repeat;
+            background-position: center top;
+            background-size: cover;
+
+            opacity: 0.58;
+            pointer-events: none;
+        }
+
+        .notification-page::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+
+            width: 100%;
+            height: 410px;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(5, 9, 36, 0.07) 0%,
+                    rgba(5, 9, 36, 0.26) 48%,
+                    rgba(5, 9, 36, 0.82) 78%,
+                    var(--background) 100%
+                );
+
+            pointer-events: none;
+        }
+
+        .notification-content {
+            position: relative;
+            z-index: 2;
+
+            width: 100%;
+            min-height: 100svh;
+
+            padding:
+                max(42px, calc(env(safe-area-inset-top) + 18px))
+                var(--page-padding)
+                max(30px, calc(env(safe-area-inset-bottom) + 18px));
+        }
+
+        /* 상단 제목 */
+        .page-header {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 52px;
+        }
+
+        .page-header__back {
+            position: absolute;
+            top: 50%;
+            left: -10px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+
+            transform: translateY(-50%);
+        }
+
+        .page-header__back:active {
+            background-color: rgba(255, 255, 255, 0.08);
+        }
+
+        .page-header__back-icon {
+            width: 25px;
+            height: 25px;
+            object-fit: contain;
+        }
+
+        .page-header__title {
+            color: var(--white);
+            font-size: 27px;
+            font-weight: 700;
+            line-height: 1;
+            letter-spacing: -0.8px;
+        }
+
+        /* 상단 배너 */
+        .notification-banner {
+            position: relative;
+
+            width: 100%;
+            min-height: 174px;
+            margin-top: 27px;
+
+            overflow: hidden;
+            border-radius: 16px;
+            background-color: #29127a;
+        }
+
+        .notification-banner__image {
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+
+            width: 100%;
+            height: 100%;
+
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .notification-banner::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 2;
+
+            background:
+                linear-gradient(
+                    90deg,
+                    rgba(31, 17, 112, 0.95) 0%,
+                    rgba(41, 22, 130, 0.76) 46%,
+                    rgba(24, 10, 91, 0.08) 100%
+                );
+
+            pointer-events: none;
+        }
+
+        .notification-banner__content {
+            position: relative;
+            z-index: 3;
+
+            width: 67%;
+            padding: 31px 0 27px 19px;
+        }
+
+        .notification-banner__title {
+            color: var(--white);
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -0.75px;
+            word-break: keep-all;
+        }
+
+        .notification-banner__description {
+            margin-top: 15px;
+
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.55;
+            letter-spacing: -0.4px;
+            word-break: keep-all;
+        }
+
+        /* 알림 그룹 */
+        .setting-group {
+            width: 100%;
+            margin-top: 29px;
+        }
+
+        .setting-group__title {
+            margin-left: 13px;
+
+            color: var(--soft-gray);
+            font-size: 17px;
+            font-weight: 600;
+            line-height: 1.4;
+            letter-spacing: -0.45px;
+        }
+
+        .setting-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+
+            width: 100%;
+            margin-top: 11px;
+            list-style: none;
+        }
+
+        /* 설정 카드 */
+        .setting-card {
+            position: relative;
+
+            display: flex;
+            align-items: center;
+
+            width: 100%;
+            min-height: 92px;
+
+            padding: 14px 16px;
+
+            border: 1px solid var(--border);
+            border-radius: 15px;
+
+            background:
+                linear-gradient(
+                    115deg,
+                    rgba(20, 29, 59, 0.98) 0%,
+                    rgba(12, 20, 45, 0.98) 100%
+                );
+
+            box-shadow:
+                inset 0 0 25px rgba(88, 95, 239, 0.025),
+                0 8px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .setting-card__icon-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+
+            width: 50px;
+            height: 50px;
+
+            border-radius: 50%;
+            background:
+                linear-gradient(
+                    145deg,
+                    rgba(78, 69, 204, 0.44),
+                    rgba(41, 35, 118, 0.7)
+                );
+        }
+
+        .setting-card__icon {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+        }
+
+        .setting-card__content {
+            flex: 1;
+            min-width: 0;
+            margin-left: 16px;
+        }
+
+        .setting-card__title {
+            display: block;
+
+            color: var(--white);
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -0.45px;
+        }
+
+        .setting-card__description {
+            display: block;
+            margin-top: 4px;
+
+            overflow: hidden;
+            color: #b8bccb;
+
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.45;
+            letter-spacing: -0.3px;
+
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 토글 */
+        .switch {
+            position: relative;
+            flex-shrink: 0;
+
+            width: 54px;
+            height: 34px;
+            margin-left: 12px;
+
+            border-radius: 999px;
+            background-color: #6e7485;
+
+            transition: background-color 0.2s ease;
+        }
+
+        .switch::after {
+            content: "";
+            position: absolute;
+            top: 3px;
+            left: 3px;
+
+            width: 28px;
+            height: 28px;
+
+            border-radius: 50%;
+            background-color: var(--white);
+
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+
+            transition: transform 0.2s ease;
+        }
+
+        .switch[aria-checked="true"] {
+            background:
+                linear-gradient(
+                    100deg,
+                    var(--primary) 0%,
+                    var(--violet) 100%
+                );
+
+            box-shadow: 0 0 14px rgba(88, 95, 239, 0.22);
+        }
+
+        .switch[aria-checked="true"]::after {
+            transform: translateX(20px);
+        }
+
+        .switch:focus-visible {
+            box-shadow:
+                0 0 0 3px rgba(255, 255, 255, 0.2),
+                0 0 0 6px rgba(138, 99, 255, 0.35);
+        }
+
+        /* 방해 금지 카드 */
+        .setting-card--quiet {
+            display: block;
+            padding: 14px 16px 16px;
+        }
+
+        .setting-card__main-row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+
+        .quiet-time-button {
+            display: flex;
+            align-items: center;
+
+            width: 100%;
+            height: 46px;
+            margin-top: 13px;
+            padding: 0 15px 0 67px;
+
+            border-radius: 10px;
+            background-color: #202947;
+
+            color: var(--soft-gray);
+        }
+
+        .quiet-time-button__text {
+            flex: 1;
+
+            color: inherit;
+            text-align: left;
+
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1;
+        }
+
+        .quiet-time-button__arrow {
+            width: 18px;
+            height: 18px;
+            object-fit: contain;
+        }
+
+        .quiet-time-button:disabled {
+            cursor: default;
+            opacity: 0.42;
+        }
+
+        .quiet-time-button:not(:disabled):active {
+            background-color: #273154;
+        }
+
+        /* 저장 버튼 */
+        .save-button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 56px;
+            margin-top: 18px;
+
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    100deg,
+                    #4363ff 0%,
+                    #7b59f2 52%,
+                    #ff69a9 100%
+                );
+
+            color: var(--white);
+            font-size: 17px;
+            font-weight: 700;
+            line-height: 1;
+
+            box-shadow: 0 8px 24px rgba(88, 95, 239, 0.18);
+        }
+
+        .save-button:active {
+            opacity: 0.84;
+        }
+
+        /* 시간 설정 바텀시트 */
+        .time-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+
+            width: 100%;
+            height: 100svh;
+
+            background-color: rgba(0, 3, 17, 0.66);
+
+            opacity: 0;
+            visibility: hidden;
+
+            transition:
+                opacity 0.25s ease,
+                visibility 0.25s ease;
+        }
+
+        .time-backdrop--open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .time-sheet {
+            position: fixed;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 110;
+
+            width: 100%;
+            padding:
+                17px
+                24px
+                max(25px, calc(env(safe-area-inset-bottom) + 15px));
+
+            border: 1px solid var(--border);
+            border-radius: 22px 22px 0 0;
+
+            background-color: #101733;
+
+            transform: translateY(105%);
+
+            transition:
+                transform 0.3s cubic-bezier(0.22, 0.74, 0.22, 1);
+        }
+
+        .time-sheet--open {
+            transform: translateY(0);
+        }
+
+        .time-sheet__handle {
+            width: 42px;
+            height: 4px;
+            margin: 0 auto;
+
+            border-radius: 999px;
+            background-color: #70768a;
+        }
+
+        .time-sheet__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            margin-top: 19px;
+        }
+
+        .time-sheet__title {
+            color: var(--white);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .time-sheet__close {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+        }
+
+        .time-sheet__close-icon {
+            width: 23px;
+            height: 23px;
+            object-fit: contain;
+        }
+
+        .time-sheet__form {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        .time-field {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .time-field__label {
+            display: block;
+
+            color: var(--muted);
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .time-field__input {
+            width: 100%;
+            height: 50px;
+            margin-top: 8px;
+            padding: 0 13px;
+
+            border: 1px solid var(--border);
+            border-radius: 11px;
+
+            background-color: #18203f;
+            color: var(--white);
+
+            font-size: 16px;
+            font-weight: 600;
+
+            color-scheme: dark;
+        }
+
+        .time-sheet__separator {
+            margin-top: 24px;
+            color: var(--soft-gray);
+            font-size: 18px;
+        }
+
+        .time-sheet__apply {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 52px;
+            margin-top: 21px;
+
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    100deg,
+                    var(--primary),
+                    var(--violet)
+                );
+
+            color: var(--white);
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* 저장 완료 토스트 */
+        .toast {
+            position: fixed;
+            right: 24px;
+            bottom: max(26px, calc(env(safe-area-inset-bottom) + 16px));
+            left: 24px;
+            z-index: 200;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            min-height: 50px;
+            padding: 12px 18px;
+
+            border: 1px solid rgba(138, 99, 255, 0.62);
+            border-radius: 12px;
+
+            background-color: rgba(15, 23, 52, 0.97);
+            color: var(--white);
+
+            font-size: 14px;
+            font-weight: 600;
+            text-align: center;
+
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.32);
+
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(15px);
+
+            transition:
+                opacity 0.22s ease,
+                visibility 0.22s ease,
+                transform 0.22s ease;
+        }
+
+        .toast--show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="notification-page">
+
+        <main class="notification-content">
+
+            <!-- 상단 내비게이션 -->
+            <header class="page-header">
+                <a
+                    class="page-header__back"
+                    href="./home.html"
+                    aria-label="홈 화면으로 돌아가기"
+                >
+                    <img
+                        class="page-header__back-icon"
+                        src="./Icons/left.svg"
+                        alt=""
+                    >
+                </a>
+
+                <h1 class="page-header__title">알림 설정</h1>
+            </header>
+
+            <!-- 안내 배너 -->
+            <section class="notification-banner">
+                <img
+                    class="notification-banner__image"
+                    src="./Images/sidebanner.png"
+                    alt="공연장에서 응원 중인 관객과 Con:nect 로고"
+                >
+
+                <div class="notification-banner__content">
+                    <h2 class="notification-banner__title">
+                        중요한 순간을 놓치지 마세요!
+                    </h2>
+
+                    <p class="notification-banner__description">
+                        CON:NECT가 여러분의 공연 여정을<br>
+                        더 특별하게 만들어드려요 💜
+                    </p>
+                </div>
+            </section>
+
+            <!-- 공연·예매 알림 -->
+            <section class="setting-group">
+                <h2 class="setting-group__title">
+                    공연·예매 알림
+                </h2>
+
+                <ul class="setting-list">
+                    <li>
+                        <article class="setting-card">
+                            <span class="setting-card__icon-box">
+                                <img
+                                    class="setting-card__icon"
+                                    src="./Icons/cuida_ticket-outline.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <div class="setting-card__content">
+                                <strong class="setting-card__title">
+                                    예매 오픈 알림
+                                </strong>
+
+                                <span class="setting-card__description">
+                                    저장한 공연의 예매 오픈 소식을 알려드려요.
+                                </span>
+                            </div>
+
+                            <button
+                                class="switch"
+                                type="button"
+                                role="switch"
+                                aria-checked="true"
+                                aria-label="예매 오픈 알림"
+                            ></button>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article class="setting-card">
+                            <span class="setting-card__icon-box">
+                                <img
+                                    class="setting-card__icon"
+                                    src="./Icons/cuida_calendar-outline.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <div class="setting-card__content">
+                                <strong class="setting-card__title">
+                                    공연 D-day 알림
+                                </strong>
+
+                                <span class="setting-card__description">
+                                    예매 완료 공연의 D-3, D-1 알림을 보내드려요.
+                                </span>
+                            </div>
+
+                            <button
+                                class="switch"
+                                type="button"
+                                role="switch"
+                                aria-checked="true"
+                                aria-label="공연 D-day 알림"
+                            ></button>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article class="setting-card">
+                            <span class="setting-card__icon-box">
+                                <img
+                                    class="setting-card__icon"
+                                    src="./Icons/mi_notification.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <div class="setting-card__content">
+                                <strong class="setting-card__title">
+                                    현장 공지 알림
+                                </strong>
+
+                                <span class="setting-card__description">
+                                    입장, 굿즈, 타임테이블 등 공식 공지를 알려드려요.
+                                </span>
+                            </div>
+
+                            <button
+                                class="switch"
+                                type="button"
+                                role="switch"
+                                aria-checked="true"
+                                aria-label="현장 공지 알림"
+                            ></button>
+                        </article>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 커뮤니티 알림 -->
+            <section class="setting-group">
+                <h2 class="setting-group__title">
+                    커뮤니티 알림
+                </h2>
+
+                <ul class="setting-list">
+                    <li>
+                        <article class="setting-card">
+                            <span class="setting-card__icon-box">
+                                <img
+                                    class="setting-card__icon"
+                                    src="./Icons/ant-design_message-outlined.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <div class="setting-card__content">
+                                <strong class="setting-card__title">
+                                    팬톡 알림
+                                </strong>
+
+                                <span class="setting-card__description">
+                                    댓글, 답글, 좋아요 등 팬톡 소식을 알려드려요.
+                                </span>
+                            </div>
+
+                            <button
+                                class="switch"
+                                type="button"
+                                role="switch"
+                                aria-checked="true"
+                                aria-label="팬톡 알림"
+                            ></button>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article class="setting-card">
+                            <span class="setting-card__icon-box">
+                                <img
+                                    class="setting-card__icon"
+                                    src="./Icons/fluent_people-16-regular.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <div class="setting-card__content">
+                                <strong class="setting-card__title">
+                                    동행 알림
+                                </strong>
+
+                                <span class="setting-card__description">
+                                    내 동행 모집 글에 새 신청이 있으면 알려드려요.
+                                </span>
+                            </div>
+
+                            <button
+                                class="switch"
+                                type="button"
+                                role="switch"
+                                aria-checked="true"
+                                aria-label="동행 알림"
+                            ></button>
+                        </article>
+                    </li>
+                </ul>
+            </section>
+
+            <!-- 서비스 알림 -->
+            <section class="setting-group">
+                <h2 class="setting-group__title">
+                    서비스 알림
+                </h2>
+
+                <ul class="setting-list">
+                    <li>
+                        <article class="setting-card">
+                            <span class="setting-card__icon-box">
+                                <img
+                                    class="setting-card__icon"
+                                    src="./Icons/heroicons-outline_speakerphone.svg"
+                                    alt=""
+                                >
+                            </span>
+
+                            <div class="setting-card__content">
+                                <strong class="setting-card__title">
+                                    서비스 공지 알림
+                                </strong>
+
+                                <span class="setting-card__description">
+                                    이벤트, 업데이트 등 중요한 소식을 알려드려요.
+                                </span>
+                            </div>
+
+                            <button
+                                class="switch"
+                                type="button"
+                                role="switch"
+                                aria-checked="true"
+                                aria-label="서비스 공지 알림"
+                            ></button>
+                        </article>
+                    </li>
+
+                    <li>
+                        <article class="setting-card setting-card--quiet">
+                            <div class="setting-card__main-row">
+                                <span class="setting-card__icon-box">
+                                    <img
+                                        class="setting-card__icon"
+                                        src="./Icons/uil_moon.svg"
+                                        alt=""
+                                    >
+                                </span>
+
+                                <div class="setting-card__content">
+                                    <strong class="setting-card__title">
+                                        방해 금지 시간
+                                    </strong>
+
+                                    <span class="setting-card__description">
+                                        설정한 시간에는 알림을 보내지 않아요.
+                                    </span>
+                                </div>
+
+                                <button
+                                    id="quietModeSwitch"
+                                    class="switch"
+                                    type="button"
+                                    role="switch"
+                                    aria-checked="false"
+                                    aria-label="방해 금지 시간"
+                                ></button>
+                            </div>
+
+                            <button
+                                id="quietTimeButton"
+                                class="quiet-time-button"
+                                type="button"
+                                disabled
+                            >
+                                <span
+                                    id="quietTimeText"
+                                    class="quiet-time-button__text"
+                                >
+                                    밤 11:00&nbsp;&nbsp;~&nbsp;&nbsp;아침 08:00
+                                </span>
+
+                                <img
+                                    class="quiet-time-button__arrow"
+                                    src="./Icons/rightgray.svg"
+                                    alt=""
+                                >
+                            </button>
+                        </article>
+                    </li>
+                </ul>
+            </section>
+
+            <button
+                id="saveButton"
+                class="save-button"
+                type="button"
+            >
+                설정 저장
+            </button>
+
+        </main>
+    </div>
+
+    <!-- 방해 금지 시간 설정 -->
+    <button
+        id="timeBackdrop"
+        class="time-backdrop"
+        type="button"
+        aria-label="시간 설정 닫기"
+    ></button>
+
+    <section
+        id="timeSheet"
+        class="time-sheet"
+        aria-hidden="true"
+        aria-label="방해 금지 시간 설정"
+    >
+        <div class="time-sheet__handle"></div>
+
+        <header class="time-sheet__header">
+            <h2 class="time-sheet__title">
+                방해 금지 시간
+            </h2>
+
+            <button
+                id="timeSheetClose"
+                class="time-sheet__close"
+                type="button"
+                aria-label="시간 설정 닫기"
+            >
+                <img
+                    class="time-sheet__close-icon"
+                    src="./Icons/close.svg"
+                    alt=""
+                >
+            </button>
+        </header>
+
+        <div class="time-sheet__form">
+            <label class="time-field">
+                <span class="time-field__label">시작 시간</span>
+
+                <input
+                    id="startTime"
+                    class="time-field__input"
+                    type="time"
+                    value="23:00"
+                >
+            </label>
+
+            <span class="time-sheet__separator">~</span>
+
+            <label class="time-field">
+                <span class="time-field__label">종료 시간</span>
+
+                <input
+                    id="endTime"
+                    class="time-field__input"
+                    type="time"
+                    value="08:00"
+                >
+            </label>
+        </div>
+
+        <button
+            id="applyTimeButton"
+            class="time-sheet__apply"
+            type="button"
+        >
+            시간 적용
+        </button>
+    </section>
+
+    <div
+        id="toast"
+        class="toast"
+        role="status"
+        aria-live="polite"
+    ></div>
+
+    <script>
+        "use strict";
+
+        const switches =
+            document.querySelectorAll(".switch");
+
+        const quietModeSwitch =
+            document.getElementById("quietModeSwitch");
+
+        const quietTimeButton =
+            document.getElementById("quietTimeButton");
+
+        const quietTimeText =
+            document.getElementById("quietTimeText");
+
+        const timeBackdrop =
+            document.getElementById("timeBackdrop");
+
+        const timeSheet =
+            document.getElementById("timeSheet");
+
+        const timeSheetClose =
+            document.getElementById("timeSheetClose");
+
+        const startTime =
+            document.getElementById("startTime");
+
+        const endTime =
+            document.getElementById("endTime");
+
+        const applyTimeButton =
+            document.getElementById("applyTimeButton");
+
+        const saveButton =
+            document.getElementById("saveButton");
+
+        const toast =
+            document.getElementById("toast");
+
+        let toastTimer = null;
+
+        function updateSwitch(button, checked) {
+            button.setAttribute(
+                "aria-checked",
+                String(checked)
+            );
+
+            if (button === quietModeSwitch) {
+                quietTimeButton.disabled = !checked;
+
+                if (!checked) {
+                    closeTimeSheet();
+                }
+            }
+        }
+
+        switches.forEach(function (button) {
+            button.addEventListener("click", function () {
+                const currentState =
+                    button.getAttribute("aria-checked") === "true";
+
+                updateSwitch(button, !currentState);
+            });
+        });
+
+        function openTimeSheet() {
+            if (quietTimeButton.disabled) {
+                return;
+            }
+
+            document.body.classList.add(
+                "is-time-panel-open"
+            );
+
+            timeBackdrop.classList.add(
+                "time-backdrop--open"
+            );
+
+            timeSheet.classList.add(
+                "time-sheet--open"
+            );
+
+            timeSheet.setAttribute(
+                "aria-hidden",
+                "false"
+            );
+        }
+
+        function closeTimeSheet() {
+            document.body.classList.remove(
+                "is-time-panel-open"
+            );
+
+            timeBackdrop.classList.remove(
+                "time-backdrop--open"
+            );
+
+            timeSheet.classList.remove(
+                "time-sheet--open"
+            );
+
+            timeSheet.setAttribute(
+                "aria-hidden",
+                "true"
+            );
+        }
+
+        function convertTimeLabel(time, type) {
+            const parts = time.split(":");
+            const hour = Number(parts[0]);
+            const minute = parts[1];
+
+            let period = type === "start" ? "밤" : "아침";
+            let displayHour = hour;
+
+            if (hour === 0) {
+                displayHour = 12;
+                period = "밤";
+            } else if (hour > 12) {
+                displayHour = hour - 12;
+                period = "밤";
+            } else if (hour >= 6 && hour < 12) {
+                period = "아침";
+            } else if (hour === 12) {
+                period = "낮";
+            }
+
+            return `${period} ${String(displayHour).padStart(2, "0")}:${minute}`;
+        }
+
+        quietTimeButton.addEventListener(
+            "click",
+            openTimeSheet
+        );
+
+        timeBackdrop.addEventListener(
+            "click",
+            closeTimeSheet
+        );
+
+        timeSheetClose.addEventListener(
+            "click",
+            closeTimeSheet
+        );
+
+        applyTimeButton.addEventListener(
+            "click",
+            function () {
+                const startLabel =
+                    convertTimeLabel(
+                        startTime.value,
+                        "start"
+                    );
+
+                const endLabel =
+                    convertTimeLabel(
+                        endTime.value,
+                        "end"
+                    );
+
+                quietTimeText.innerHTML =
+                    `${startLabel}&nbsp;&nbsp;~&nbsp;&nbsp;${endLabel}`;
+
+                closeTimeSheet();
+                showToast("방해 금지 시간이 적용되었습니다.");
+            }
+        );
+
+        function showToast(message) {
+            window.clearTimeout(toastTimer);
+
+            toast.textContent = message;
+            toast.classList.add("toast--show");
+
+            toastTimer = window.setTimeout(
+                function () {
+                    toast.classList.remove(
+                        "toast--show"
+                    );
+                },
+                2400
+            );
+        }
+
+        saveButton.addEventListener(
+            "click",
+            function () {
+                const settings = {};
+
+                switches.forEach(function (button) {
+                    settings[
+                        button.getAttribute("aria-label")
+                    ] =
+                        button.getAttribute("aria-checked") ===
+                        "true";
+                });
+
+                settings.quietStart = startTime.value;
+                settings.quietEnd = endTime.value;
+
+                localStorage.setItem(
+                    "connectNotificationSettings",
+                    JSON.stringify(settings)
+                );
+
+                showToast("알림 설정이 저장되었습니다.");
+            }
+        );
+
+        document.addEventListener(
+            "keydown",
+            function (event) {
+                if (
+                    event.key === "Escape" &&
+                    timeSheet.classList.contains(
+                        "time-sheet--open"
+                    )
+                ) {
+                    closeTimeSheet();
+                }
+            }
+        );
+
+        function restoreSavedSettings() {
+            const savedData =
+                localStorage.getItem(
+                    "connectNotificationSettings"
+                );
+
+            if (!savedData) {
+                return;
+            }
+
+            try {
+                const settings =
+                    JSON.parse(savedData);
+
+                switches.forEach(function (button) {
+                    const label =
+                        button.getAttribute("aria-label");
+
+                    if (
+                        typeof settings[label] ===
+                        "boolean"
+                    ) {
+                        updateSwitch(
+                            button,
+                            settings[label]
+                        );
+                    }
+                });
+
+                if (settings.quietStart) {
+                    startTime.value =
+                        settings.quietStart;
+                }
+
+                if (settings.quietEnd) {
+                    endTime.value =
+                        settings.quietEnd;
+                }
+
+                const startLabel =
+                    convertTimeLabel(
+                        startTime.value,
+                        "start"
+                    );
+
+                const endLabel =
+                    convertTimeLabel(
+                        endTime.value,
+                        "end"
+                    );
+
+                quietTimeText.innerHTML =
+                    `${startLabel}&nbsp;&nbsp;~&nbsp;&nbsp;${endLabel}`;
+            } catch (error) {
+                localStorage.removeItem(
+                    "connectNotificationSettings"
+                );
+            }
+        }
+
+        restoreSavedSettings();
+    </script>
+</body>
+</html>

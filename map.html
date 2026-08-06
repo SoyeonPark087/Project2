@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>공연장 안내</title>
+
+    <style>
+        :root {
+            --primary: #585fef;
+            --violet: #8a63ff;
+            --pink: #ff6faf;
+            --mint: #34d1bf;
+            --amber: #ffb347;
+
+            --background: #03071c;
+            --surface: #10172f;
+            --surface-light: #151d39;
+            --border: #4e566f;
+
+            --white: #ffffff;
+            --soft-gray: #dbdce6;
+            --muted: #a3a8bb;
+
+            --page-padding: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            min-height: 100%;
+        }
+
+        body {
+            overflow-x: hidden;
+            overflow-y: auto;
+            background-color: var(--background);
+            color: var(--white);
+            font-family:
+                Pretendard,
+                -apple-system,
+                BlinkMacSystemFont,
+                "Apple SD Gothic Neo",
+                "Noto Sans KR",
+                sans-serif;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+            cursor: pointer;
+        }
+
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        img {
+            display: block;
+        }
+
+        .venue-page {
+            position: relative;
+            width: 100%;
+            min-height: 100svh;
+            overflow: hidden;
+            background:
+                radial-gradient(
+                    circle at 80% 16%,
+                    rgba(88, 95, 239, 0.12),
+                    transparent 27%
+                ),
+                radial-gradient(
+                    circle at 10% 58%,
+                    rgba(138, 99, 255, 0.08),
+                    transparent 30%
+                ),
+                var(--background);
+        }
+
+        .venue-content {
+            width: 100%;
+            min-height: 100svh;
+            padding:
+                max(25px, env(safe-area-inset-top))
+                var(--page-padding)
+                max(40px, env(safe-area-inset-bottom));
+        }
+
+        /* 상단 내비게이션 */
+        .page-header {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 50px;
+        }
+
+        .page-header__back {
+            position: absolute;
+            top: 50%;
+            left: -8px;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 44px;
+            height: 44px;
+
+            transform: translateY(-50%);
+        }
+
+        .page-header__back-icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .page-header__title {
+            color: var(--white);
+            font-size: 28px;
+            font-weight: 700;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+
+        /* 공연 요약 카드 */
+        .concert-card {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 150px;
+            margin-top: 23px;
+            padding: 14px;
+
+            border: 1px solid var(--border);
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    120deg,
+                    rgba(20, 29, 57, 0.98),
+                    rgba(11, 17, 39, 0.98)
+                );
+
+            box-shadow:
+                0 12px 35px rgba(0, 0, 0, 0.24),
+                inset 0 0 30px rgba(88, 95, 239, 0.04);
+        }
+
+        .concert-card__poster {
+            flex-shrink: 0;
+            width: 94px;
+            height: 124px;
+            overflow: hidden;
+            border-radius: 12px;
+            background-color: #171350;
+        }
+
+        .concert-card__poster-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center;
+        }
+
+        .concert-card__content {
+            flex: 1;
+            min-width: 0;
+            margin-left: 17px;
+        }
+
+        .concert-card__title {
+            color: var(--white);
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1.35;
+            letter-spacing: -0.5px;
+            word-break: keep-all;
+        }
+
+        .concert-card__location {
+            display: flex;
+            align-items: center;
+            margin-top: 13px;
+
+            color: var(--soft-gray);
+            font-size: 16px;
+            font-weight: 400;
+            line-height: 1.3;
+        }
+
+        .concert-card__location-icon {
+            flex-shrink: 0;
+            width: 21px;
+            height: 21px;
+            margin-right: 8px;
+            object-fit: contain;
+        }
+
+        .concert-card__status {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: fit-content;
+            height: 29px;
+            margin-top: 13px;
+            padding: 0 12px;
+
+            border: 1px solid var(--violet);
+            border-radius: 8px;
+
+            color: var(--soft-gray);
+            font-size: 13px;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        /* 지도 */
+        .map-card {
+            position: relative;
+            width: 100%;
+            height: 340px;
+            margin-top: 14px;
+            overflow: hidden;
+
+            border: 1px solid var(--border);
+            border-radius: 18px;
+
+            background-color: #10172f;
+        }
+
+        #kakaoMap {
+            position: absolute;
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+
+            background-repeat: no-repeat;
+            background-position: center;
+            background-size: cover;
+        }
+
+        /* 지도 위 어두운 분위기 보정 */
+        .map-card::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+
+            background:
+                linear-gradient(
+                    180deg,
+                    rgba(6, 11, 31, 0.1),
+                    rgba(6, 11, 31, 0.2)
+                );
+
+            pointer-events: none;
+        }
+
+        /* 카카오맵 커스텀 오버레이 */
+        .map-label {
+            display: flex;
+            align-items: center;
+
+            min-height: 36px;
+            padding: 0 12px;
+
+            border: 1px solid rgba(255, 255, 255, 0.55);
+            border-radius: 9px;
+
+            background-color: rgba(7, 12, 35, 0.92);
+            color: #ffffff;
+
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+
+            box-shadow:
+                0 0 18px rgba(88, 95, 239, 0.35),
+                0 4px 14px rgba(0, 0, 0, 0.35);
+        }
+
+        /* 이동수단 탭 */
+        .transport-tabs {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+            height: 55px;
+            margin-top: 14px;
+            padding: 4px;
+
+            border: 1px solid var(--border);
+            border-radius: 15px;
+
+            background-color: rgba(8, 13, 36, 0.94);
+        }
+
+        .transport-tabs__button {
+            position: relative;
+            display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 0;
+            border-radius: 11px;
+
+            background-color: transparent;
+            color: var(--soft-gray);
+
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        .transport-tabs__button + .transport-tabs__button::before {
+            content: "";
+            position: absolute;
+            top: 10px;
+            bottom: 10px;
+            left: 0;
+
+            width: 1px;
+            background-color: rgba(219, 220, 230, 0.13);
+        }
+
+        .transport-tabs__button--active {
+            background:
+                linear-gradient(
+                    105deg,
+                    var(--primary) 0%,
+                    var(--violet) 100%
+                );
+
+            color: var(--white);
+            font-weight: 700;
+
+            box-shadow:
+                0 0 18px rgba(88, 95, 239, 0.28);
+        }
+
+        .transport-tabs__button--active::before,
+        .transport-tabs__button--active + .transport-tabs__button::before {
+            display: none;
+        }
+
+        /* 경로 정보 */
+        .route-information {
+            width: 100%;
+            margin-top: 14px;
+            padding: 8px 16px;
+
+            border: 1px solid var(--border);
+            border-radius: 18px;
+
+            background:
+                linear-gradient(
+                    125deg,
+                    rgba(19, 28, 55, 0.98),
+                    rgba(10, 16, 37, 0.98)
+                );
+        }
+
+        .route-information__row {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            min-height: 55px;
+        }
+
+        .route-information__row + .route-information__row {
+            border-top: 1px solid rgba(219, 220, 230, 0.13);
+        }
+
+        .route-information__icon {
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .route-information__label {
+            flex-shrink: 0;
+            margin-left: 14px;
+
+            color: var(--soft-gray);
+            font-size: 15px;
+            font-weight: 500;
+            line-height: 1.35;
+        }
+
+        .route-information__value {
+            flex: 1;
+            min-width: 0;
+            margin-left: 15px;
+
+            overflow: hidden;
+            color: var(--white);
+            text-align: right;
+
+            font-size: 14px;
+            font-weight: 400;
+            line-height: 1.4;
+
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        /* 길찾기 버튼 */
+        .route-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 11px;
+            width: 100%;
+            margin-top: 14px;
+        }
+
+        .route-actions__start {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 58px;
+            border-radius: 12px;
+
+            background:
+                linear-gradient(
+                    105deg,
+                    #4e54f4 0%,
+                    #7755f0 55%,
+                    #8d45df 100%
+                );
+
+            color: var(--white);
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .route-actions__preview {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 53px;
+            padding: 0 17px;
+
+            border: 1px solid var(--violet);
+            border-radius: 12px;
+
+            background-color: rgba(7, 12, 35, 0.55);
+            color: var(--soft-gray);
+
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1;
+        }
+
+        .route-actions__preview-text {
+            flex: 1;
+            text-align: center;
+        }
+
+        .route-actions__preview-icon {
+            width: 19px;
+            height: 19px;
+            object-fit: contain;
+        }
+
+        .route-actions__start:active,
+        .route-actions__preview:active {
+            opacity: 0.82;
+        }
+
+        /* 안내 정보 */
+        .guide-section {
+            width: 100%;
+            margin-top: 22px;
+        }
+
+        .guide-section__title {
+            color: var(--white);
+            font-size: 20px;
+            font-weight: 700;
+            line-height: 1.3;
+            letter-spacing: -0.5px;
+        }
+
+        .guide-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            width: 100%;
+            margin-top: 11px;
+        }
+
+        .guide-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            min-width: 0;
+            height: 104px;
+            padding: 10px 4px;
+
+            border: 1px solid var(--border);
+            border-radius: 13px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(20, 29, 57, 0.98),
+                    rgba(11, 17, 38, 0.98)
+                );
+        }
+
+        .guide-card__icon {
+            width: 37px;
+            height: 37px;
+            object-fit: contain;
+        }
+
+        .guide-card__bottom {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-top: 13px;
+        }
+
+        .guide-card__label {
+            overflow: hidden;
+            color: var(--soft-gray);
+
+            font-size: 12px;
+            font-weight: 500;
+            line-height: 1;
+
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .guide-card__arrow {
+            flex-shrink: 0;
+            width: 14px;
+            height: 14px;
+            margin-left: 3px;
+            object-fit: contain;
+        }
+
+        /* 알림 메시지 */
+        .toast {
+            position: fixed;
+            right: 20px;
+            bottom: 28px;
+            left: 20px;
+            z-index: 1000;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            min-height: 50px;
+            padding: 12px 18px;
+
+            border: 1px solid rgba(138, 99, 255, 0.65);
+            border-radius: 12px;
+
+            background-color: rgba(12, 18, 44, 0.97);
+            color: var(--white);
+
+            font-size: 14px;
+            line-height: 1.45;
+            text-align: center;
+
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(16px);
+
+            transition:
+                opacity 0.2s ease,
+                transform 0.2s ease,
+                visibility 0.2s ease;
+        }
+
+        .toast--show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="venue-page">
+
+        <main class="venue-content">
+
+            <!-- 상단 내비게이션 -->
+            <header class="page-header">
+                <a
+                    class="page-header__back"
+                    href="./event2.html"
+                    aria-label="공연 상세 화면으로 돌아가기"
+                >
+                    <img
+                        class="page-header__back-icon"
+                        src="./Icons/left.svg"
+                        alt="뒤로가기"
+                    >
+                </a>
+
+                <h1 class="page-header__title">공연장 안내</h1>
+            </header>
+
+            <!-- 공연 정보 -->
+            <section class="concert-card">
+                <div class="concert-card__poster">
+                    <img
+                        class="concert-card__poster-image"
+                        src="./Images/04-2.png"
+                        alt="2025 Con:nect Live Tour 공연 포스터"
+                    >
+                </div>
+
+                <div class="concert-card__content">
+                    <h2 class="concert-card__title">
+                        2025 CON:NECT LIVE TOUR
+                    </h2>
+
+                    <p class="concert-card__location">
+                        <img
+                            class="concert-card__location-icon"
+                            src="./Icons/map.svg"
+                            alt=""
+                        >
+                        KSPO DOME
+                    </p>
+
+                    <span class="concert-card__status">
+                        공연 예정
+                    </span>
+                </div>
+            </section>
+
+            <!-- 카카오 지도 -->
+            <section
+                class="map-card"
+                aria-label="올림픽공원역과 KSPO DOME 지도"
+            >
+                <div id="kakaoMap"></div>
+            </section>
+
+            <!-- 이동수단 선택 -->
+            <nav
+                class="transport-tabs"
+                aria-label="이동수단 선택"
+            >
+                <button
+                    class="transport-tabs__button"
+                    type="button"
+                    data-mode="foot"
+                >
+                    도보
+                </button>
+
+                <button
+                    class="transport-tabs__button transport-tabs__button--active"
+                    type="button"
+                    data-mode="publictransit"
+                >
+                    대중교통
+                </button>
+
+                <button
+                    class="transport-tabs__button"
+                    type="button"
+                    data-mode="car"
+                >
+                    차량
+                </button>
+            </nav>
+
+            <!-- 선택한 이동수단 정보 -->
+            <section
+                id="routeInformation"
+                class="route-information"
+                aria-live="polite"
+            ></section>
+
+            <!-- 길찾기 -->
+            <div class="route-actions">
+                <button
+                    id="startRouteButton"
+                    class="route-actions__start"
+                    type="button"
+                >
+                    길찾기 시작
+                </button>
+
+                <button
+                    id="previewRouteButton"
+                    class="route-actions__preview"
+                    type="button"
+                >
+                    <span class="route-actions__preview-text">
+                        경로 미리보기
+                    </span>
+
+                    <img
+                        class="route-actions__preview-icon"
+                        src="./Icons/right.svg"
+                        alt=""
+                    >
+                </button>
+            </div>
+
+            <!-- 안내 정보 -->
+            <section class="guide-section">
+                <h2 class="guide-section__title">안내 정보</h2>
+
+                <div class="guide-grid">
+
+                    <a
+                        class="guide-card"
+                        href="./entrance-guide.html"
+                    >
+                        <img
+                            class="guide-card__icon"
+                            src="./Icons/log-in.svg"
+                            alt=""
+                        >
+
+                        <span class="guide-card__bottom">
+                            <span class="guide-card__label">입장 게이트</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="guide-card"
+                        href="./parking-guide.html"
+                    >
+                        <img
+                            class="guide-card__icon"
+                            src="./Icons/car.svg"
+                            alt=""
+                        >
+
+                        <span class="guide-card__bottom">
+                            <span class="guide-card__label">주차 안내</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="guide-card"
+                        href="./luggage-guide.html"
+                    >
+                        <img
+                            class="guide-card__icon"
+                            src="./Icons/baggage.svg"
+                            alt=""
+                        >
+
+                        <span class="guide-card__bottom">
+                            <span class="guide-card__label">물품보관소</span>
+                        </span>
+                    </a>
+
+                    <a
+                        class="guide-card"
+                        href="./goods-booth.html"
+                    >
+                        <img
+                            class="guide-card__icon"
+                            src="./Icons/shirt.svg"
+                            alt=""
+                        >
+
+                        <span class="guide-card__bottom">
+                            <span class="guide-card__label">굿즈 부스</span>
+                        </span>
+                    </a>
+
+                </div>
+            </section>
+
+        </main>
+
+        <div
+            id="toast"
+            class="toast"
+            role="status"
+            aria-live="polite"
+        ></div>
+
+    </div>
+    
+<script
+    src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=18c8508b256818bfd7519b07216214dc"
+></script>
+    <script>
+        "use strict";
+
+        /*
+         * 검색 실패 시 사용할 기본 좌표입니다.
+         * 실제 지도에서는 Kakao Places로 장소를 다시 검색합니다.
+         */
+        const FALLBACK_STATION = {
+            name: "KSPO DOME",
+            latitude: 37.51634,
+            longitude: 127.13077
+        };
+
+        let map = null;
+        let stationMarker = null;
+        let selectedMode = "publictransit";
+        let toastTimer = null;
+
+
+        const routeInformation =
+            document.getElementById("routeInformation");
+
+        const transportButtons =
+            document.querySelectorAll(".transport-tabs__button");
+
+        const startRouteButton =
+            document.getElementById("startRouteButton");
+
+        const previewRouteButton =
+            document.getElementById("previewRouteButton");
+
+        const toast =
+            document.getElementById("toast");
+
+        /*
+         * 시안에 표시된 안내값입니다.
+         * 실제 교통상황에 따른 시간은 카카오맵 길찾기 화면에서 확인합니다.
+         */
+        const routeData = {
+            foot: [
+                {
+                    icon: "./Icons/location.svg",
+                    label: "출발지",
+                    value: "올림픽공원역 3번 출구"
+                },
+                {
+                    icon: "./Icons/map.svg",
+                    label: "도착지",
+                    value: "KSPO DOME"
+                },
+                {
+                    icon: "./Icons/clock.svg",
+                    label: "예상 시간",
+                    value: "약 12분"
+                },
+                {
+                    icon: "./Icons/walk.svg",
+                    label: "거리",
+                    value: "약 850m"
+                }
+            ],
+
+            publictransit: [
+                {
+                    icon: "./Icons/location.svg",
+                    label: "출발지",
+                    value: "올림픽공원역 3번 출구"
+                },
+                {
+                    icon: "./Icons/map.svg",
+                    label: "도착지",
+                    value: "KSPO DOME"
+                },
+                {
+                    icon: "./Icons/clock.svg",
+                    label: "예상 시간",
+                    value: "약 15분"
+                },
+                {
+                    icon: "./Icons/bus.svg",
+                    label: "이용 노선",
+                    value: "도보 + 9호선 이용"
+                },
+                {
+                    icon: "./Icons/down.svg",
+                    label: "하차 정보",
+                    value: "올림픽공원역 하차 후 도보 이동"
+                }
+            ],
+
+            car: [
+                {
+                    icon: "./Icons/location.svg",
+                    label: "출발지",
+                    value: "올림픽공원역 3번 출구"
+                },
+                {
+                    icon: "./Icons/map.svg",
+                    label: "도착지",
+                    value: "KSPO DOME"
+                },
+                {
+                    icon: "./Icons/clock.svg",
+                    label: "예상 시간",
+                    value: "약 6분"
+                },
+                {
+                    icon: "./Icons/car.svg",
+                    label: "거리",
+                    value: "약 2.1km"
+                },
+                {
+                    icon: "./Icons/parking.svg",
+                    label: "주차 안내",
+                    value: "주차장 이용 가능"
+                }
+            ]
+        };
+
+        function renderRouteInformation(mode) {
+            const rows = routeData[mode];
+
+            if (!rows) {
+                return;
+            }
+
+            routeInformation.innerHTML = rows.map(function (row) {
+                return `
+                    <div class="route-information__row">
+                        <img
+                            class="route-information__icon"
+                            src="${row.icon}"
+                            alt=""
+                        >
+
+                        <span class="route-information__label">
+                            ${row.label}
+                        </span>
+
+                        <span class="route-information__value">
+                            ${row.value}
+                        </span>
+                    </div>
+                `;
+            }).join("");
+        }
+
+        function selectTransportMode(mode) {
+            if (!routeData[mode]) {
+                return;
+            }
+
+            selectedMode = mode;
+
+            transportButtons.forEach(function (button) {
+                const isActive =
+                    button.dataset.mode === selectedMode;
+
+                button.classList.toggle(
+                    "transport-tabs__button--active",
+                    isActive
+                );
+
+                button.setAttribute(
+                    "aria-pressed",
+                    String(isActive)
+                );
+            });
+
+            renderRouteInformation(selectedMode);
+        }
+
+        transportButtons.forEach(function (button) {
+            button.addEventListener("click", function () {
+                selectTransportMode(button.dataset.mode);
+            });
+        });
+
+        function showToast(message) {
+            window.clearTimeout(toastTimer);
+
+            toast.textContent = message;
+            toast.classList.add("toast--show");
+
+            toastTimer = window.setTimeout(function () {
+                toast.classList.remove("toast--show");
+            }, 3000);
+        }
+
+       function initializeMap() {
+    const container =
+        document.getElementById("kakaoMap");
+
+    /* KSPO DOME 위치 */
+    const stationPosition =
+        new kakao.maps.LatLng(
+            37.5191503,
+            127.1273644
+        );
+
+    /* 지도 생성 */
+    map = new kakao.maps.Map(container, {
+        center: stationPosition,
+        level: 3
+    });
+
+    /* KSPO DOME에 카카오 기본 핀 하나만 표시 */
+    stationMarker = new kakao.maps.Marker({
+        map: map,
+        position: stationPosition,
+        title: "KSPO DOME"
+    });
+}
+        function requestCurrentLocation(callback) {
+            if (!navigator.geolocation) {
+                showToast(
+                    "현재 위치를 지원하지 않는 환경입니다."
+                );
+
+                return;
+            }
+
+            showToast("현재 위치를 확인하고 있습니다.");
+
+            navigator.geolocation.getCurrentPosition(
+                function (position) {
+                    const latitude =
+                        position.coords.latitude;
+
+                    const longitude =
+                        position.coords.longitude;
+
+                    callback(latitude, longitude);
+                },
+
+                function (error) {
+                    let message =
+                        "현재 위치를 가져오지 못했습니다.";
+
+                    if (
+                        error.code ===
+                        error.PERMISSION_DENIED
+                    ) {
+                        message =
+                            "위치 권한을 허용한 후 다시 시도해 주세요.";
+                    } else if (
+                        error.code ===
+                        error.POSITION_UNAVAILABLE
+                    ) {
+                        message =
+                            "현재 위치 정보를 확인할 수 없습니다.";
+                    } else if (
+                        error.code ===
+                        error.TIMEOUT
+                    ) {
+                        message =
+                            "위치 확인 시간이 초과되었습니다.";
+                    }
+
+                    showToast(message);
+                },
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 60000
+                }
+            );
+        }
+
+        function openRoute(useNewWindow) {
+            requestCurrentLocation(
+                function (latitude, longitude) {
+                    const routeUrl =
+                        createKakaoRouteUrl(
+                            latitude,
+                            longitude,
+                            selectedMode
+                        );
+
+                    if (useNewWindow) {
+                        window.open(
+                            routeUrl,
+                            "_blank",
+                            "noopener,noreferrer"
+                        );
+                    } else {
+                        window.location.href = routeUrl;
+                    }
+                }
+            );
+        }
+
+        startRouteButton.addEventListener(
+            "click",
+            function () {
+                openRoute(false);
+            }
+        );
+
+        previewRouteButton.addEventListener(
+            "click",
+            function () {
+                openRoute(true);
+            }
+        );
+
+        renderRouteInformation(selectedMode);
+
+        if (
+    typeof kakao !== "undefined" &&
+    kakao.maps
+) {
+    initializeMap();
+} else {
+    console.error(
+        "카카오 지도 API를 불러오지 못했습니다."
+    );
+}
+    </script>
+</body>
+</html>
