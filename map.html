@@ -1098,7 +1098,12 @@
                 }
             );
         }
-function createKakaoRouteUrl(targetMode) {
+/* 현재 위치에서 KSPO DOME까지의 카카오맵 주소 생성 */
+function createKakaoRouteUrl(
+    latitude,
+    longitude,
+    targetMode
+) {
     const modeMap = {
         foot: "walk",
         publictransit: "traffic",
@@ -1109,42 +1114,107 @@ function createKakaoRouteUrl(targetMode) {
         modeMap[targetMode] || "traffic";
 
     const startName =
-        encodeURIComponent(
-            "올림픽공원역 3번 출구"
-        );
+        encodeURIComponent("현재 위치");
 
     const endName =
-        encodeURIComponent(
-            "KSPO DOME"
-        );
+        encodeURIComponent("KSPO DOME");
 
     return (
         `https://map.kakao.com/link/by/${kakaoMode}/` +
-        `${startName},37.51634,127.13077/` +
+        `${startName},${latitude},${longitude}/` +
         `${endName},37.51915,127.12725`
     );
 }
-        function openRoute(useNewWindow) {
-                    const routeUrl =
-                        createKakaoRouteUrl(selectedMode);
 
-                    if (useNewWindow) {
-                        window.open(
-                            routeUrl,
-                            "_blank",
-                            "noopener,noreferrer"
-                        );
-                    } else {
-                        window.location.href = routeUrl;
-                    }
-                }
 
-        startRouteButton.addEventListener(
-            "click",
-            function () {
-                openRoute(false);
-            }
+/* 버튼 클릭 시 현재 위치를 확인한 뒤 카카오맵 실행 */
+function openRoute(useNewWindow) {
+    if (!navigator.geolocation) {
+        showToast(
+            "현재 위치를 지원하지 않는 환경입니다."
         );
+        return;
+    }
+
+    showToast("현재 위치를 확인하고 있습니다.");
+
+    /*
+     * 새 창은 위치 확인이 끝난 뒤 열면
+     * 팝업으로 차단될 수 있으므로 미리 생성합니다.
+     */
+    let routeWindow = null;
+
+    if (useNewWindow) {
+        routeWindow = window.open("", "_blank");
+
+        if (!routeWindow) {
+            showToast(
+                "팝업 차단을 해제한 후 다시 시도해 주세요."
+            );
+            return;
+        }
+    }
+
+    navigator.geolocation.getCurrentPosition(
+        function (position) {
+            const latitude =
+                position.coords.latitude;
+
+            const longitude =
+                position.coords.longitude;
+
+            const routeUrl =
+                createKakaoRouteUrl(
+                    latitude,
+                    longitude,
+                    selectedMode
+                );
+
+            if (routeWindow) {
+                routeWindow.location.href = routeUrl;
+            } else {
+                window.location.href = routeUrl;
+            }
+        },
+
+        function (error) {
+            if (routeWindow) {
+                routeWindow.close();
+            }
+
+            let message =
+                "현재 위치를 가져오지 못했습니다.";
+
+            if (
+                error.code ===
+                error.PERMISSION_DENIED
+            ) {
+                message =
+                    "위치 권한을 허용한 후 다시 시도해 주세요.";
+            } else if (
+                error.code ===
+                error.POSITION_UNAVAILABLE
+            ) {
+                message =
+                    "현재 위치 정보를 확인할 수 없습니다.";
+            } else if (
+                error.code ===
+                error.TIMEOUT
+            ) {
+                message =
+                    "현재 위치 확인 시간이 초과되었습니다.";
+            }
+
+            showToast(message);
+        },
+
+        {
+            enableHighAccuracy: true,
+            timeout: 10000,
+            maximumAge: 60000
+        }
+    );
+}
 
         previewRouteButton.addEventListener(
             "click",
