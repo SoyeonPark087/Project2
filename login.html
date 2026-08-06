@@ -8,9 +8,27 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
     >
 
-    <title>로그인</title>
+    <title>공연 상세</title>
 
     <style>
+        :root {
+            --primary: #585fef;
+            --violet: #8a63ff;
+            --pink: #ff6faf;
+            --mint: #34d1bf;
+            --amber: #ffb347;
+
+            --background: #060a27;
+            --surface: #141c3d;
+            --border: #555b70;
+
+            --white: #ffffff;
+            --soft-gray: #dbdce6;
+            --muted: #a0a5b8;
+
+            --page-padding: 24px;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -25,8 +43,9 @@
 
         body {
             overflow-x: hidden;
-            background-color: #050924;
-            color: #ffffff;
+            overflow-y: auto;
+            background-color: var(--background);
+            color: var(--white);
             font-family:
                 Pretendard,
                 -apple-system,
@@ -41,337 +60,453 @@
             text-decoration: none;
         }
 
-        button,
-        input {
-            font: inherit;
+        img {
+            display: block;
         }
 
-        button {
-            border: 0;
-            cursor: pointer;
-        }
-
-        .login-page {
-            position: relative;
-            isolation: isolate;
+        .performance-detail {
             width: 100%;
             min-height: 100svh;
             overflow-y: auto;
-            background-color: #050924;
+            background-color: var(--background);
         }
 
-        /* 상단 우주 배경 이미지 */
-        .login-page::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 0;
-
+        /* 공연 대표 이미지 */
+        .hero {
+            position: relative;
             width: 100%;
-            height: 340px;
-
-            background-image: url("./Images/03-1.png");
-            background-repeat: no-repeat;
-            background-position: center top;
-            background-size: cover;
-            pointer-events: none;
-            opacity: 0.82;
+            height: 394px;
+            overflow: hidden;
+            background-color: #160653;
         }
 
-        /* 배경 이미지와 본문이 자연스럽게 연결되도록 처리 */
-        .login-page::after {
+        .hero__image {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+        }
+
+        /* 이미지 상단과 하단의 어두운 오버레이 */
+        .hero::after {
             content: "";
             position: absolute;
-            top: 0;
-            left: 0;
+            inset: 0;
             z-index: 1;
-
-            width: 100%;
-            height: 380px;
-
             background:
                 linear-gradient(
                     180deg,
-                    rgba(5, 9, 36, 0.05) 0%,
-                    rgba(5, 9, 36, 0.2) 58%,
-                    #050924 100%
+                    rgba(4, 6, 25, 0.14) 0%,
+                    rgba(5, 7, 29, 0.04) 36%,
+                    rgba(6, 10, 39, 0.16) 61%,
+                    var(--background) 100%
                 );
             pointer-events: none;
         }
 
-        .login-page__inner {
-            position: relative;
-            z-index: 2;
+        /* 이전 화면 링크 */
+        .hero__back {
+            position: absolute;
+            top: 51px;
+            left: 18px;
+            z-index: 3;
 
-            width: 100%;
-            min-height: 100svh;
-            padding:
-                119px
-                24px
-                max(32px, env(safe-area-inset-bottom));
-        }
-
-        /* 로고 및 브랜드 문구 */
-        .brand {
             display: flex;
-            flex-direction: column;
             align-items: center;
-            width: 100%;
-            text-align: center;
+            justify-content: center;
+
+            width: 44px;
+            height: 44px;
         }
 
-        .brand__logo {
-            display: block;
-            width: 96px;
-            height: 70px;
+        .hero__back-icon {
+            width: 22px;
+            height: 22px;
             object-fit: contain;
         }
 
-        .brand__title {
-            margin-top: 10px;
-            color: #ffffff;
-            font-size: 34px;
+        /* 이미지 중앙 공연명 */
+        .hero__title {
+            position: absolute;
+            top: 145px;
+            left: 50%;
+            z-index: 2;
+
+            width: calc(100% - 48px);
+            color: var(--white);
+            text-align: center;
+
+            font-size: 31px;
+            font-weight: 800;
+            line-height: 1.22;
+            letter-spacing: -1.1px;
+
+            transform: translateX(-50%);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.22);
+        }
+
+        .detail-content {
+            position: relative;
+            z-index: 2;
+            width: 100%;
+            margin-top: -1px;
+            padding:
+                8px
+                var(--page-padding)
+                max(40px, env(safe-area-inset-bottom));
+            background-color: var(--background);
+        }
+
+        /* 공연 날짜와 장소 */
+        .performance-info {
+            width: 100%;
+        }
+
+        .performance-info__date {
+            color: var(--white);
+            font-size: 20px;
             font-weight: 700;
-            line-height: 1.15;
-            letter-spacing: -1.4px;
+            line-height: 1.35;
+            letter-spacing: -0.45px;
         }
 
-        .brand__description {
-            margin-top: 3px;
-            color: #dbdce6;
-            font-size: 15px;
-            font-weight: 400;
-            line-height: 1.45;
-            letter-spacing: -0.4px;
-        }
-
-        /* 로그인 입력 영역 */
-        .login-form {
-            width: 100%;
-            margin-top: 67px;
-        }
-
-        .login-form__field + .login-form__field {
-            margin-top: 9px;
-        }
-
-        .login-form__input {
-            display: block;
-            width: 100%;
-            height: 56px;
-            padding: 0 23px;
-
-            border: 1px solid #5c6070;
-            border-radius: 14px;
-            outline: none;
-
-            background-color: #151d3d;
-            color: #ffffff;
-
-            font-size: 15px;
+        .performance-info__location {
+            margin-top: 2px;
+            color: var(--soft-gray);
+            font-size: 16px;
             font-weight: 500;
-            line-height: 56px;
+            line-height: 1.4;
             letter-spacing: -0.3px;
         }
 
-        .login-form__input::placeholder {
-            color: #ffffff;
-            opacity: 0.9;
+        .performance-info__badges {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 17px;
         }
 
-        .login-form__input:focus {
-            border-color: #8a63ff;
-            box-shadow: 0 0 0 2px rgba(138, 99, 255, 0.16);
-        }
-
-        .login-form__input:-webkit-autofill,
-        .login-form__input:-webkit-autofill:hover,
-        .login-form__input:-webkit-autofill:focus {
-            -webkit-text-fill-color: #ffffff;
-            box-shadow: 0 0 0 1000px #151d3d inset;
-            transition: background-color 9999s ease-in-out 0s;
-        }
-
-        /* 로그인 버튼 */
-        .login-form__submit {
+        .status-badge {
             display: flex;
             align-items: center;
             justify-content: center;
 
+            height: 33px;
+            padding: 0 15px;
+            border-radius: 999px;
+
+            font-size: 14px;
+            font-weight: 700;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        .status-badge--available {
+            background-color: var(--mint);
+            color: var(--white);
+        }
+
+        .status-badge--dday {
+            min-width: 57px;
+            background-color: var(--amber);
+            color: #111111;
+        }
+
+        /* 공연 기능 메뉴 */
+        .quick-menu {
             width: 100%;
+            height: 80px;
+            margin-top: 16px;
+            padding: 0 7px;
+
+            border: 1px solid var(--border);
+            border-radius: 15px;
+            background-color: var(--surface);
+        }
+
+        .quick-menu__list {
+            display: flex;
+            align-items: stretch;
+            width: 100%;
+            height: 100%;
+            list-style: none;
+        }
+
+        .quick-menu__item {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .quick-menu__link {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+
+            width: 100%;
+            height: 100%;
+        }
+
+        .quick-menu__icon {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+        }
+
+        .quick-menu__label {
+            margin-top: 7px;
+            color: var(--soft-gray);
+            font-size: 12px;
+            font-weight: 400;
+            line-height: 1;
+            white-space: nowrap;
+        }
+
+        /* 저장 및 예매 버튼 */
+        .main-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            width: 100%;
+            margin-top: 16px;
+        }
+
+        .main-actions__button {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: center;
+
             height: 56px;
-            margin-top: 24px;
-
             border-radius: 13px;
-            background:
-                linear-gradient(
-                    100deg,
-                    #585fef 0%,
-                    #8a63ff 100%
-                );
 
-            color: #ffffff;
             font-size: 15px;
             font-weight: 700;
             line-height: 1;
         }
 
-        .login-form__submit:active {
-            opacity: 0.86;
+        .main-actions__button--save {
+            position: relative;
+            border: 1px solid transparent;
+            background:
+                linear-gradient(
+                    var(--background),
+                    var(--background)
+                ) padding-box,
+                linear-gradient(
+                    105deg,
+                    var(--primary),
+                    var(--violet)
+                ) border-box;
+            color: var(--primary);
         }
 
-        /* SNS 로그인 버튼 */
-        .sns-login {
+        .main-actions__button--booking {
+            background:
+                linear-gradient(
+                    105deg,
+                    var(--primary) 0%,
+                    var(--violet) 57%,
+                    var(--pink) 100%
+                );
+            color: var(--white);
+        }
+
+        .main-actions__button:active {
+            opacity: 0.84;
+        }
+
+        /* 팬톡 보기 */
+        .fan-talk-link {
             display: flex;
             align-items: center;
             justify-content: center;
 
             width: 100%;
-            height: 56px;
-            margin-top: 8px;
+            height: 64px;
+            margin-top: 16px;
 
-            border: 1px solid #8a63ff;
+            border: 1px solid var(--primary);
             border-radius: 13px;
 
             background-color: transparent;
-            color: #8a63ff;
+            color: var(--primary);
 
             font-size: 15px;
             font-weight: 700;
             line-height: 1;
         }
 
-        .sns-login:active {
-            background-color: rgba(138, 99, 255, 0.1);
-        }
-
-        /* 회원가입 및 비밀번호 찾기 */
-        .account-links {
+        .fan-talk-link__count {
             display: flex;
             align-items: center;
             justify-content: center;
 
-            width: 100%;
-            margin-top: 35px;
-
-            color: #dbdce6;
-            font-size: 15px;
-            font-weight: 400;
-            line-height: 1;
-        }
-
-        .account-links__item {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 44px;
+            min-width: 39px;
+            height: 33px;
+            margin-left: 10px;
             padding: 0 8px;
+
+            border: 1px solid #555b70;
+            border-radius: 999px;
+
+            color: var(--white);
+            font-size: 14px;
+            font-weight: 600;
         }
 
-        .account-links__divider {
-            display: block;
-            width: 1px;
-            height: 16px;
-            margin: 0 2px;
-            background-color: rgba(219, 220, 230, 0.8);
-        }
-
-        .account-links__item:active {
-            color: #ffffff;
+        .fan-talk-link:active {
+            background-color: rgba(88, 95, 239, 0.1);
         }
     </style>
 </head>
 
 <body>
-    <main class="login-page">
-        <div class="login-page__inner">
+    <main class="performance-detail">
 
-            <!-- 브랜드 영역 -->
-            <header class="brand">
-                <img
-                    class="brand__logo"
-                    src="./Images/logo2.png"
-                    alt="Con:nect 심볼 로고"
-                >
-
-                <h1 class="brand__title">Con:nect</h1>
-
-                <p class="brand__description">
-                    팬의 모든 순간을 연결합니다
-                </p>
-            </header>
-
-            <!-- 로그인 폼 -->
-            <form
-                class="login-form"
-                action="./home.html"
-                method="get"
+        <!-- 공연 대표 이미지 -->
+        <section class="hero">
+            <img
+                class="hero__image"
+                src="./Images/07.png"
+                alt="보라색 조명의 Con:nect Live Tour 공연장"
             >
-                <div class="login-form__field">
-                    <input
-                        class="login-form__input"
-                        type="text"
-                        name="userId"
-                        placeholder="아이디"
-                        aria-label="아이디"
-                        autocomplete="username"
-                    >
-                </div>
 
-                <div class="login-form__field">
-                    <input
-                        class="login-form__input"
-                        type="password"
-                        name="password"
-                        placeholder="비밀번호"
-                        aria-label="비밀번호"
-                        autocomplete="current-password"
-                    >
-                </div>
-
-                <button
-                    class="login-form__submit"
-                    type="submit"
-                >
-                    로그인하기
-                </button>
-            </form>
-
-            <!-- SNS 로그인 -->
             <a
-                class="sns-login"
-                href="./sns-login.html"
+                class="hero__back"
+                href="./event1.html"
+                aria-label="내 공연 화면으로 돌아가기"
             >
-                SNS로 시작하기
+                <img
+                    class="hero__back-icon"
+                    src="./Icons/left.svg"
+                    alt=""
+                >
             </a>
 
-            <!-- 계정 관련 링크 -->
-            <nav
-                class="account-links"
-                aria-label="계정 관련 메뉴"
-            >
-                <a
-                    class="account-links__item"
-                    href="./signup.html"
-                >
-                    회원가입하기
-                </a>
+            <h1 class="hero__title">
+                2025<br>
+                CON:NECT<br>
+                LIVE TOUR
+            </h1>
+        </section>
 
-                <span
-                    class="account-links__divider"
-                    aria-hidden="true"
-                ></span>
+        <section class="detail-content">
 
-                <a
-                    class="account-links__item"
-                    href="./find-password.html"
-                >
-                    비밀번호 찾기
-                </a>
+            <!-- 공연 기본 정보 -->
+            <div class="performance-info">
+                <p class="performance-info__date">
+                    2026.07.20 (일) 18:00
+                </p>
+
+                <p class="performance-info__location">
+                    KSPO DOME
+                </p>
+
+                <div class="performance-info__badges">
+                    <span class="status-badge status-badge--available">
+                        예매 오픈
+                    </span>
+
+                    <span class="status-badge status-badge--dday">
+                        D-3
+                    </span>
+                </div>
+            </div>
+
+            <!-- 공연 기능 메뉴 -->
+            <nav class="quick-menu" aria-label="공연 상세 기능">
+                <ul class="quick-menu__list">
+
+                    <li class="quick-menu__item">
+                        <a
+                            class="quick-menu__link"
+                            href="./saved-performance.html"
+                        >
+                            <img
+                                class="quick-menu__icon"
+                                src="./Icons/star.svg"
+                                alt=""
+                            >
+                            <span class="quick-menu__label">저장</span>
+                        </a>
+                    </li>
+
+                    <li class="quick-menu__item">
+                        <a
+                            class="quick-menu__link"
+                            href="./performance-guide.html"
+                        >
+                            <img
+                                class="quick-menu__icon"
+                                src="./Icons/info.svg"
+                                alt=""
+                            >
+                            <span class="quick-menu__label">공연 안내</span>
+                        </a>
+                    </li>
+
+                    <li class="quick-menu__item">
+                        <a
+                            class="quick-menu__link"
+                            href="./map.html"
+                        >
+                            <img
+                                class="quick-menu__icon"
+                                src="./Icons/map.svg"
+                                alt=""
+                            >
+                            <span class="quick-menu__label">공연장 정보</span>
+                        </a>
+                    </li>
+
+                    <li class="quick-menu__item">
+                        <a
+                            class="quick-menu__link"
+                            href="./share.html"
+                        >
+                            <img
+                                class="quick-menu__icon"
+                                src="./Icons/share.svg"
+                                alt=""
+                            >
+                            <span class="quick-menu__label">공유</span>
+                        </a>
+                    </li>
+
+                </ul>
             </nav>
 
-        </div>
+            <!-- 주요 행동 버튼 -->
+            <div class="main-actions">
+                <a
+                    class="main-actions__button main-actions__button--save"
+                    href="./saved-performance.html"
+                >
+                    저장하기
+                </a>
+
+                <a
+                    class="main-actions__button main-actions__button--booking"
+                    href="./booking-guide.html"
+                >
+                    예매하기
+                </a>
+            </div>
+
+            <!-- 팬톡 보기 -->
+            <a
+                class="fan-talk-link"
+                href="./talk.html"
+            >
+                <span>팬톡 보기</span>
+                <span class="fan-talk-link__count">128</span>
+            </a>
+
+        </section>
+
     </main>
 </body>
 </html>
