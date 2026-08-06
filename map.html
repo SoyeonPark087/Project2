@@ -836,6 +836,11 @@
             latitude: 37.51634,
             longitude: 127.13077
         };
+        const VENUE = {
+    name: "KSPO DOME",
+    latitude: 37.51915,
+    longitude: 127.12725
+};
 
         let map = null;
         let stationMarker = null;
@@ -1093,16 +1098,35 @@
                 }
             );
         }
+function createKakaoRouteUrl(targetMode) {
+    const modeMap = {
+        foot: "walk",
+        publictransit: "traffic",
+        car: "car"
+    };
 
+    const kakaoMode =
+        modeMap[targetMode] || "traffic";
+
+    const startName =
+        encodeURIComponent(
+            "올림픽공원역 3번 출구"
+        );
+
+    const endName =
+        encodeURIComponent(
+            "KSPO DOME"
+        );
+
+    return (
+        `https://map.kakao.com/link/by/${kakaoMode}/` +
+        `${startName},37.51634,127.13077/` +
+        `${endName},37.51915,127.12725`
+    );
+}
         function openRoute(useNewWindow) {
-            requestCurrentLocation(
-                function (latitude, longitude) {
                     const routeUrl =
-                        createKakaoRouteUrl(
-                            latitude,
-                            longitude,
-                            selectedMode
-                        );
+                        createKakaoRouteUrl(selectedMode);
 
                     if (useNewWindow) {
                         window.open(
@@ -1114,8 +1138,6 @@
                         window.location.href = routeUrl;
                     }
                 }
-            );
-        }
 
         startRouteButton.addEventListener(
             "click",
