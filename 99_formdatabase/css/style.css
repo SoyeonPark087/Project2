@@ -23,6 +23,7 @@ textarea{
     height: 185px;
     background-color: #262626;
     box-sizing: border-box;
+    padding: 16px;
     margin-bottom: 45px;
 }
 
