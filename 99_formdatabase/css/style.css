@@ -38,3 +38,9 @@ textarea{
     cursor: pointer;
 
 }
+#msg{
+    color: #ff0050;
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 20px;
+}
